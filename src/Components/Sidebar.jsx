@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Card } from "@nextui-org/react";
-import { ArrowLeftIcon, MessageCircleIcon } from "../Icons";
+import { ArrowLeftIcon, MessageCircleIcon } from "./Icons";
 
 const steps = [
     "Welcome",
