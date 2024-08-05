@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input } from "@nextui-org/react";
+import axios from "axios";
 
 export default function SelectNumber({ updateFormData, formData, NavigationButtons }) {
     const [availableNumbers, setAvailableNumbers] = useState([]);
+    const [wait, setWait] = useState(false);
 
     const generateNumbers = (count) => {
         return Array.from({ length: count }, () => {
@@ -14,8 +16,15 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
     };
 
     useEffect(() => {
-        setAvailableNumbers(generateNumbers(4));
-    }, []);
+        setWait(true);
+        axios.post('http://localhost:3000/getAvailableNumbers').then((res) => { setAvailableNumbers(generateNumbers(4)) }).catch(error => { console.error(error) });
+        setWait(false);
+    }, [])
+
+
+    // useEffect(() => {
+    //     setAvailableNumbers(generateNumbers(4));
+    // }, []);
 
     const handleNumberSelect = (number) => {
         updateFormData("selectedNumber", number);
@@ -36,16 +45,18 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
             {formData.numberType === "new" ? (
                 <>
                     <div className="grid grid-cols-2 gap-4 mb-6">
-                        {availableNumbers.map((number) => (
-                            <Button
-                                key={number}
-                                color={formData.selectedNumber === number ? "primary" : "default"}
-                                onClick={() => handleNumberSelect(number)}
-                                className="py-6 text-lg font-semibold"
-                            >
-                                {number}
-                            </Button>
-                        ))}
+                        {
+                            availableNumbers.map((number) => (
+                                <Button
+                                    key={number}
+                                    color={formData.selectedNumber === number ? "primary" : "default"}
+                                    onClick={() => handleNumberSelect(number)}
+                                    className="py-6 text-lg font-semibold"
+                                >
+                                    {number}
+                                </Button>
+                            ))
+                        }
                     </div>
                     <Button
                         color="secondary"

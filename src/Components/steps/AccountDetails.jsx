@@ -6,6 +6,8 @@ export default function AccountDetails({ updateFormData, formData, NavigationBut
         updateFormData(e.target.name, e.target.value);
     };
 
+    console.log(formData)
+
     return (
         <div className="w-full max-w-2xl mx-auto">
             <h1 className="text-3xl font-bold text-center mb-4">Create Your Account</h1>
@@ -21,9 +23,9 @@ export default function AccountDetails({ updateFormData, formData, NavigationBut
                     />
                     <Input
                         label="Last Name"
-                        name="lastName"
+                        name="surname"
                         placeholder="Type your last name here"
-                        value={formData.lastName}
+                        value={formData.surname}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -33,6 +35,30 @@ export default function AccountDetails({ updateFormData, formData, NavigationBut
                     placeholder="john.doe@gmail.com"
                     type="email"
                     value={formData.email}
+                    onChange={handleInputChange}
+                />
+                <Input
+                    label="Preferred Contact Method"
+                    name="preferredContactMethod"
+                    placeholder="Phone or Email"
+                    type="text"
+                    value={formData.preferredContactMethod}
+                    onChange={handleInputChange}
+                />
+                <Input
+                    label="Date of Birth"
+                    name="dob"
+                    placeholder="Phone or Email"
+                    type="text"
+                    value={formData.dob}
+                    onChange={handleInputChange}
+                />
+                <Input
+                    label="Customer Type"
+                    name="custType"
+                    placeholder="Business or Individual"
+                    type="text"
+                    value={formData.custTypes}
                     onChange={handleInputChange}
                 />
             </form>

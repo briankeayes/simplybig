@@ -16,8 +16,12 @@ export default function App() {
 
     // Account details
     firstName: "",
-    lastName: "",
+    surname: "",
     email: "",
+    sal: "",
+    preferredContactMethod: "",
+    dob: "",
+    custType: "",
 
     // Company info (if needed)
     companyName: "",
@@ -46,7 +50,7 @@ export default function App() {
   const handleSubmit = async () => {
     try {
       // Here you would typically send the formData to your server
-      const response = await fetch('your-api-endpoint', {
+      const response = await fetch('http://localhost:3000/addcustomer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

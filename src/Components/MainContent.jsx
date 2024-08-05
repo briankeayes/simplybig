@@ -48,7 +48,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
         switch (step) {
             case 1: return !formData.simType;
             case 2: return !formData.numberType;
-            case 3: return !formData.firstName || !formData.lastName || !formData.email;
+            case 3: return !formData.firstName || !formData.surname || !formData.email;
             case 4: return !formData.companyName || !formData.companySize;
             case 5: return !formData.selectedPlan;
             case 6: return !formData.selectedNumber && formData.numberType === 'new';

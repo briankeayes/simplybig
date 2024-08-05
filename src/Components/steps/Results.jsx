@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@nextui-org/react";
 
 export default function Results({ handlePrevStep, formData, handleSubmit }) {
+
     return (
         <>
             <h1 className="text-3xl font-bold text-center mb-4">Review Your Information</h1>
