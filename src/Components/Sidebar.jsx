@@ -7,7 +7,7 @@ const steps = [
     "Select SIM Type",
     "Select Number Type",
     "Account Details",
-    "Company Info",
+    // "Company Info",
     "Plans",
     "Select Number",
     "Results"

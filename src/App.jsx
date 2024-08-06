@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import Sidebar from "./Components/Sidebar";
 import MainContent from "./Components/MainContent";
-import { URL } from "./constants";
+import { API_URL } from "./constants";
 
 export default function App() {
-  const [currentStep, setCurrentStep] = useState(3);
+  const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState({});
   const [formData, setFormData] = useState({
     // SIM selection
@@ -19,10 +19,10 @@ export default function App() {
     firstName: "",
     surname: "",
     email: "",
-    sal: "he",
-    preferredContactMethod: "email",
+    sal: "",
+    preferredContactMethod: "",
     dob: "",
-    custType: "B",
+    custType: "",
 
     // Company info (if needed)
     companyName: "",
@@ -36,20 +36,20 @@ export default function App() {
     selectedNumber: null,
   });
   const handleNextStep = () => {
-    if (formData.custType === "I" && currentStep === 3) {
-      setCompletedSteps(prev => ({ ...prev, [currentStep]: true }));
-      setCurrentStep(prevStep => prevStep + 2);
-      return;
-    }
+    // if (formData.custType === "I" && currentStep === 3) {
+    //   setCompletedSteps(prev => ({ ...prev, [currentStep]: true }));
+    //   setCurrentStep(prevStep => prevStep + 2);
+    //   return;
+    // }
     setCompletedSteps(prev => ({ ...prev, [currentStep]: true }));
     setCurrentStep(prevStep => prevStep + 1);
   };
 
   const handlePrevStep = () => {
-    if (formData.custType === "I" && currentStep === 5) {
-      setCurrentStep(prevStep => prevStep - 2);
-      return;
-    }
+    // if (formData.custType === "I" && currentStep === 5) {
+    //   setCurrentStep(prevStep => prevStep - 2);
+    //   return;
+    // }
     setCurrentStep(prevStep => prevStep - 1);
   };
 
@@ -60,7 +60,7 @@ export default function App() {
   const handleSubmit = async () => {
     try {
       // Here you would typically send the formData to your server
-      const response = await fetch(`${URL}/addcustomer`, {
+      const response = await fetch(`${API_URL}/addcustomer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

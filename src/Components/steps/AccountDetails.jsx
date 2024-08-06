@@ -1,113 +1,319 @@
-import React from "react";
-import { Button, Input } from "@nextui-org/react";
+import React, { useState, useEffect, useRef } from "react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Card, CardBody, Spinner } from "@nextui-org/react";
 
-export default function AccountDetails({ updateFormData, formData, NavigationButtons }) {
+export default function AccountDetails({ updateFormData, formData, onValidationChange, isLoading, isSubmitted }) {
+    const salutations = ["Mr", "Mrs", "Ms", "Mstr", "Miss", "Dr", "Mx", "Other"];
+    const autocompleteInput = useRef(null);
+    const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        // Load Google Maps JavaScript API script
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAUKRbwl61ZS5CfzHB5L_KQeOdLAG2gFV8&libraries=places`;
+        script.async = true;
+        script.onload = initAutocomplete;
+        document.body.appendChild(script);
+
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, []);
+
+    const initAutocomplete = () => {
+        if (!autocompleteInput.current) return;
+
+        const autocomplete = new window.google.maps.places.Autocomplete(autocompleteInput.current, {
+            componentRestrictions: { country: "au" },
+            fields: ["address_components", "formatted_address"],
+            types: ["address"],
+        });
+
+        autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+            if (!place.address_components) return;
+
+            let postcode = "";
+            let state = "";
+            let suburb = "";
+
+            for (const component of place.address_components) {
+                const componentType = component.types[0];
+                switch (componentType) {
+                    case "postal_code":
+                        postcode = component.long_name;
+                        break;
+                    case "administrative_area_level_1":
+                        state = component.short_name;
+                        break;
+                    case "locality":
+                        suburb = component.long_name;
+                        break;
+                }
+            }
+
+            updateFormData("address", place.formatted_address);
+            updateFormData("postcode", postcode);
+            updateFormData("state", state);
+            updateFormData("suburb", suburb);
+        });
+    };
+
     const handleInputChange = (e) => {
-        updateFormData(e.target.name, e.target.value);
+        const { name, value } = e.target;
+        updateFormData(name, value);
+        validateField(name, value);
     };
 
     const handleContactMethod = (method) => {
         updateFormData("preferredContactMethod", method);
+        validateField("preferredContactMethod", method);
     }
-    const handleSalutation = (sal) => {
-        updateFormData("sal", sal);
-    }
+
     const handleCustType = (cust) => {
         updateFormData("custType", cust);
+        validateField("custType", cust);
     }
 
-    console.log(formData)
+    const handleSelectionChange = (field) => (selectedKeys) => {
+        const selectedValue = Array.from(selectedKeys)[0];
+        updateFormData(field, selectedValue);
+        validateField(field, selectedValue);
+    };
+
+    const validateField = (name, value) => {
+        let newErrors = { ...errors };
+        switch (name) {
+            case "firstName":
+            case "surname":
+                if (!value.trim()) {
+                    newErrors[name] = `${name === "firstName" ? "First" : "Last"} name is required`;
+                } else {
+                    delete newErrors[name];
+                }
+                break;
+            case "email":
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!value.trim()) {
+                    newErrors.email = "Email is required";
+                } else if (!emailRegex.test(value)) {
+                    newErrors.email = "Invalid email format";
+                } else {
+                    delete newErrors.email;
+                }
+                break;
+            case "sal":
+                if (!value) {
+                    newErrors.sal = "Salutation is required";
+                } else {
+                    delete newErrors.sal;
+                }
+                break;
+            case "dob":
+                if (!value) {
+                    newErrors.dob = "Date of Birth is required";
+                } else {
+                    const dobDate = new Date(value);
+                    const today = new Date();
+                    const age = today.getFullYear() - dobDate.getFullYear();
+                    if (age < 18) {
+                        newErrors.dob = "Must be at least 18 years old";
+                    } else {
+                        delete newErrors.dob;
+                    }
+                }
+                break;
+            case "address":
+                if (!value.trim()) {
+                    newErrors.address = "Address is required";
+                } else {
+                    delete newErrors.address;
+                }
+                break;
+            case "preferredContactMethod":
+                if (!value) {
+                    newErrors.preferredContactMethod = "Preferred contact method is required";
+                } else {
+                    delete newErrors.preferredContactMethod;
+                }
+                break;
+            case "custType":
+                if (!value) {
+                    newErrors.custType = "Customer type is required";
+                } else {
+                    delete newErrors.custType;
+                }
+                break;
+            case "abn":
+                if (formData.custType === "B" && (!value || value.length !== 11)) {
+                    newErrors.abn = "Valid 11-digit ABN is required for business customers";
+                } else {
+                    delete newErrors.abn;
+                }
+                break;
+            case "phoneNumber":
+                const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
+                if (!value.trim()) {
+                    newErrors.phoneNumber = "Phone number is required";
+                } else if (!phoneRegex.test(value)) {
+                    newErrors.phoneNumber = "Invalid Australian phone number format";
+                } else {
+                    delete newErrors.phoneNumber;
+                }
+                break;
+            default:
+                break;
+        }
+        setErrors(newErrors);
+    };
+
+    const validateForm = () => {
+        const requiredFields = ['firstName', 'surname', 'email', 'address', 'postcode', 'state', 'suburb', 'custType', 'dob', 'preferredContactMethod', 'sal'];
+        const isValid = requiredFields.every(field => formData[field]) && Object.keys(errors).length === 0;
+        onValidationChange(isValid);
+        return isValid;
+    };
+
+    useEffect(() => {
+        validateForm();
+    }, [formData, errors]);
+
+    const renderField = (name, label, placeholder, type = "text") => (
+        <Input
+            label={label}
+            name={name}
+            value={formData[name]}
+            onChange={handleInputChange}
+            variant="bordered"
+            errorMessage={errors[name]}
+            isInvalid={!!errors[name]}
+            isDisabled={isSubmitted || isLoading}
+            type={type}
+            placeholder={placeholder}
+        />
+    );
 
     return (
-        <div className="w-full max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold text-center mb-4">Create Your Account</h1>
-            <p className="text-center text-gray-400 mb-6">Enter your personal information.</p>
-            <form className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card className="w-full max-w-2xl mx-auto">
+            {isLoading && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <Spinner label="Adding customer..." color="white" />
+                </div>
+            )}
+            <CardBody className="p-8">
+                <h1 className="text-3xl font-bold text-center mb-2">Create Your Account</h1>
+                <p className="text-center text-gray-400 mb-8">Enter your personal information.</p>
+                <form className="space-y-6">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        {renderField("firstName", "First Name", "Type your first name here")}
+                        {renderField("surname", "Last Name", "Type your last name here")}
+                    </div>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        {renderField("email", "Email", "email@company.com", 'email')}
+
+                        {renderField("phoneNumber", "Phone Number", "Enter your phone number", 'email')}
+
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <Dropdown size={"md"}>
+                            <DropdownTrigger>
+                                <Button
+                                    isDisabled={isSubmitted || isLoading}
+                                    variant="bordered"
+                                    className={`w-full justify-start ${errors.sal ? 'border-red-500' : ''}`}
+                                >
+                                    {formData.sal || "Select Salutation"}
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                                aria-label="Salutation selection"
+                                variant="flat"
+                                disallowEmptySelection
+                                selectionMode="single"
+                                selectedKeys={formData.sal ? [formData.sal] : []}
+                                onSelectionChange={handleSelectionChange("sal")}
+                            >
+                                {salutations.map((salutation) => (
+                                    <DropdownItem key={salutation}>{salutation}</DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        </Dropdown>
+                        {errors.sal && <p className="text-red-500 text-sm">{errors.sal}</p>}
+
+                        {renderField("dob", "Date of Birth", "Select your date of birth", "date")}
+
+                    </div>
                     <Input
-                        label="First Name"
-                        name="firstName"
-                        placeholder="Type your first name here"
-                        value={formData.firstName}
+                        ref={autocompleteInput}
+                        label="Address"
+                        name="address"
+                        placeholder="Start typing your address"
+                        value={formData.address}
                         onChange={handleInputChange}
+                        variant="bordered"
+                        errorMessage={errors.address}
+                        isDisabled={isSubmitted || isLoading}
+                        isInvalid={!!errors.address}
                     />
-                    <Input
-                        label="Last Name"
-                        name="surname"
-                        placeholder="Type your last name here"
-                        value={formData.surname}
-                        onChange={handleInputChange}
-                    />
-                </div>
-                <Input
-                    label="Email"
-                    name="email"
-                    placeholder="john.doe@gmail.com"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                />
-                <h1 className="text-xs font-light text-neutral-200 tracking-wider">Preferred Contact Type</h1>
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <Button
-                        color={formData.preferredContactMethod === "email" ? "primary" : "default"}
-                        className="px-6 py-3 rounded-full"
-                        onClick={() => handleContactMethod("email")}
-                    >
-                        Email
-                    </Button>
-                    <Button
-                        color={formData.preferredContactMethod === "phone" ? "primary" : "default"}
-                        className="px-6 py-3 rounded-full"
-                        onClick={() => handleContactMethod("phone")}
-                    >
-                        Phone
-                    </Button>
-                </div>
-                <h1 className="text-xs font-light text-neutral-200 tracking-wide">Salutation</h1>
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <Button
-                        color={formData.sal === "he" ? "primary" : "default"}
-                        className="px-6 py-3 rounded-full"
-                        onClick={() => handleSalutation("he")}
-                    >
-                        He
-                    </Button>
-                    <Button
-                        color={formData.sal === "she" ? "primary" : "default"}
-                        className="px-6 py-3 rounded-full"
-                        onClick={() => handleSalutation("she")}
-                    >
-                        She
-                    </Button>
-                </div>
-                <Input
-                    label="Date of Birth"
-                    name="dob"
-                    placeholder="Phone or Email"
-                    type="date"
-                    value={formData.dob}
-                    onChange={handleInputChange}
-                />
-                <h1 className="text-xs font-light text-neutral-200 tracking-wide">Customer Type</h1>
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <Button
-                        color={formData.custType === "B" ? "primary" : "default"}
-                        className="px-6 py-3 rounded-full"
-                        onClick={() => handleCustType("B")}
-                    >
-                        Business
-                    </Button>
-                    <Button
-                        color={formData.custType === "I" ? "primary" : "default"}
-                        className="px-6 py-3 rounded-full"
-                        onClick={() => handleCustType("I")}
-                    >
-                        Individual
-                    </Button>
-                </div>
-            </form>
-            {NavigationButtons}
-        </div>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                        {renderField("suburb", "Suburb", "Enter your Suburb")}
+                        {renderField("state", "State", "Enter your State")}
+                        {renderField("postcode", "Postcode", "Enter your Postcode")}
+
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-sm font-medium text-gray-600">Preferred Contact Method</h2>
+                        <div className="flex gap-4">
+                            <Button
+                                color={formData.preferredContactMethod === "Email" ? "primary" : "default"}
+                                variant={formData.preferredContactMethod === "Email" ? "solid" : "bordered"}
+                                isDisabled={isSubmitted || isLoading}
+                                className="flex-1"
+                                onClick={() => handleContactMethod("Email")}
+                            >
+                                Email
+                            </Button>
+                            <Button
+                                isDisabled={isSubmitted || isLoading}
+                                color={formData.preferredContactMethod === "SMS" ? "primary" : "default"}
+                                variant={formData.preferredContactMethod === "SMS" ? "solid" : "bordered"}
+                                className="flex-1"
+                                onClick={() => handleContactMethod("SMS")}
+                            >
+                                SMS
+                            </Button>
+                        </div>
+                        {errors.preferredContactMethod && <p className="text-red-500 text-sm">{errors.preferredContactMethod}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-sm font-medium text-gray-600">Customer Type</h2>
+                        <div className="flex gap-4">
+                            <Button
+                                isDisabled={isSubmitted || isLoading}
+                                color={formData.custType === "B" ? "primary" : "default"}
+                                variant={formData.custType === "B" ? "solid" : "bordered"}
+                                className="flex-1"
+                                onClick={() => handleCustType("B")}
+                            >
+                                Business
+                            </Button>
+                            <Button
+                                color={formData.custType === "R" ? "primary" : "default"}
+                                isDisabled={isSubmitted || isLoading}
+                                variant={formData.custType === "R" ? "solid" : "bordered"}
+                                className="flex-1"
+                                onClick={() => handleCustType("R")}
+                            >
+                                Individual
+                            </Button>
+                        </div>
+                        {errors.custType && <p className="text-red-500 text-sm">{errors.custType}</p>}
+                    </div>
+                    {formData.custType === "B" && (
+                        renderField("abn", "Australian Business Number (ABN)", "Enter your ABN")
+                    )}
+                </form>
+            </CardBody>
+        </Card>
     );
 }
