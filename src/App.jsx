@@ -25,10 +25,6 @@ export default function App() {
     dob: "",
     custType: "",
 
-    // Company info (if needed)
-    companyName: "",
-    companySize: "",
-
     // Plan selection
     selectedPlan: null,
 
@@ -37,20 +33,11 @@ export default function App() {
     selectedNumber: null,
   });
   const handleNextStep = () => {
-    // if (formData.custType === "I" && currentStep === 3) {
-    //   setCompletedSteps(prev => ({ ...prev, [currentStep]: true }));
-    //   setCurrentStep(prevStep => prevStep + 2);
-    //   return;
-    // }
     setCompletedSteps(prev => ({ ...prev, [currentStep]: true }));
     setCurrentStep(prevStep => prevStep + 1);
   };
 
   const handlePrevStep = () => {
-    // if (formData.custType === "I" && currentStep === 5) {
-    //   setCurrentStep(prevStep => prevStep - 2);
-    //   return;
-    // }
     setCurrentStep(prevStep => prevStep - 1);
   };
 
@@ -58,10 +45,10 @@ export default function App() {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = async () => {
+  const handleFinalSubmit = async () => {
     try {
       // Here you would typically send the formData to your server
-      const response = await fetch(`${API_URL}/addcustomer`, {
+      const response = await fetch(`${API_URL}/CreateOrder`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +86,7 @@ export default function App() {
           handlePrevStep={handlePrevStep}
           formData={formData}
           updateFormData={updateFormData}
-          handleSubmit={handleSubmit}
+          handleSubmit={handleFinalSubmit}
         />
       </div>
     </div>

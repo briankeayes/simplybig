@@ -10,7 +10,7 @@ export default function NavigationButtons({
   showNextButton = true
 }) {
   return (
-    <div className="flex justify-between mt-8 w-full">
+    <div className="flex justify-between mt-8 aw-full">
       {currentStep > 0 && (
         <Button
           color="default"
@@ -24,7 +24,7 @@ export default function NavigationButtons({
         <Button
           color="primary"
           onClick={handleNextStep}
-          disabled={isNextDisabled}
+          isDisabled={isNextDisabled}
           className={`px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 ${currentStep === 0 ? 'ml-auto' : ''}`}
         >
           {nextButtonText}

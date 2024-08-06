@@ -12,17 +12,6 @@ import { API_URL } from "../constants";
 import { Button, Card, CardBody } from "@nextui-org/react";
 
 
-const pageVariants = {
-    initial: { opacity: 0, x: "-100%" },
-    in: { opacity: 1, x: 0 },
-    out: { opacity: 0, x: "100%" }
-};
-
-const pageTransition = {
-    type: "tween",
-    ease: "anticipate",
-    duration: 0.5
-};
 const SuccessOverlay = ({ custNo, onClose }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <Card className="w-96">
@@ -30,7 +19,7 @@ const SuccessOverlay = ({ custNo, onClose }) => (
           <h2 className="text-2xl font-bold mb-4">Account Created Successfully!</h2>
           <p className="mb-4">Your customer number is:</p>
           <p className="text-3xl font-bold mb-6">{custNo}</p>
-          <Button color="primary" onClick={onClose}>Continue</Button>
+          <Button color="primary" className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500" onClick={onClose}>Continue</Button>
         </CardBody>
       </Card>
     </div>
@@ -101,6 +90,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
         setShowSuccessOverlay(false);
         handleNextStep(); // Proceed to the next step
     };
+
     const renderStep = () => {
         const props = {
             handleNextStep,
@@ -108,7 +98,6 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
             updateFormData,
             formData
         };
-
         switch (currentStep) {
             case 0: return <Welcome {...props} />;
             case 1: return <SelectSimType {...props} />;
@@ -119,20 +108,20 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
                 isSubmitted={isSubmitted}
                 onValidationChange={setIsAccountDetailsValid}
             />;
-            // case 4: return <CompanyInfo {...props} />;
             case 4: return <SelectPlan {...props} />;
             case 5: return <SelectNumber {...props} />;
             case 6: return <Results {...props} />;
+            
             default: return <div>Step not implemented yet</div>;
         }
     };
 
     const getNextButtonDisabledState = (step, formData) => {
         switch (step) {
+            case 0: return false; // Welcome screen
             case 1: return !formData.simType;
             case 2: return !formData.numberType;
-            case 3: return !isAccountDetailsValid || isLoading
-            // case 4: return !formData.companyName || !formData.companySize;
+            case 3: return !isAccountDetailsValid || isLoading;
             case 4: return !formData.selectedPlan;
             case 5: return !formData.selectedNumber && formData.numberType === 'new';
             default: return false;
@@ -142,11 +131,13 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
     const getNextButtonHandler = (step) => {
         switch (step) {
             case 3: return handleAccountDetailsSubmit;
+            case 6: return handleSubmit;
             default: return handleNextStep;
         }
     };
 
-    const isLastStep = currentStep === 7;
+    const isLastStep = currentStep === 6; // Now the last step is 5 (SelectNumber)
+
     const pageVariants = {
         initial: { opacity: 0, x: "-100%" },
         in: { opacity: 1, x: 0 },

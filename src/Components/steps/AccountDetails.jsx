@@ -199,6 +199,19 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                     <Spinner label="Adding customer..." color="white" />
                 </div>
             )}
+            {isSubmitted && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <Card className="w-96">
+                            <CardBody className="text-center">
+                                <h2 className="text-2xl font-bold mb-4">Account Created Successfully!</h2>
+                                <p className="mb-4">Your customer number is:</p>
+                                <p className="text-3xl font-bold mb-6 ">{formData.custNo}</p>
+                            </CardBody>
+                        </Card>
+                    </div>
+                </div>
+            )}
             <CardBody className="p-8">
                 <h1 className="text-3xl font-bold text-center mb-2">Create Your Account</h1>
                 <p className="text-center text-gray-400 mb-8">Enter your personal information.</p>
