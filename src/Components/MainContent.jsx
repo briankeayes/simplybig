@@ -10,17 +10,6 @@ import SelectNumber from "./steps/SelectNumber";
 import Results from "./steps/Results";
 import NavigationButtons from "./NavigationButtons";
 
-const pageVariants = {
-    initial: { opacity: 0, x: "-100%" },
-    in: { opacity: 1, x: 0 },
-    out: { opacity: 0, x: "100%" }
-};
-
-const pageTransition = {
-    type: "tween",
-    ease: "anticipate",
-    duration: 0.5
-};
 
 export default function MainContent({ currentStep, handleNextStep, handlePrevStep, formData, updateFormData, handleSubmit }) {
     const renderStep = () => {
@@ -57,9 +46,20 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
     };
 
     const isLastStep = currentStep === 7;
+    const pageVariants = {
+        initial: { opacity: 0, x: "-100%" },
+        in: { opacity: 1, x: 0 },
+        out: { opacity: 0, x: "100%" }
+    };
+
+    const pageTransition = {
+        type: "tween",
+        ease: "anticipate",
+        duration: 0.5
+    };
 
     return (
-        <main className="flex-1 flex items-center justify-center p-6 overflow-y-auto">
+        <main className="flex-1 flex items-center justify-center p-4 md:p-6 overflow-y-auto">
             <div className="w-full max-w-4xl flex flex-col min-h-[80vh] justify-center">
                 <AnimatePresence mode="wait">
                     <motion.div

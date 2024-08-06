@@ -13,7 +13,7 @@ const steps = [
     "Results"
 ];
 
-export default function Sidebar({ currentStep, handlePrevStep, setCurrentStep, completedSteps }) {
+export default function Sidebar({ currentStep, handlePrevStep, setCurrentStep, completedSteps, isSidebarOpen, setIsSidebarOpen }) {
     const handleStepClick = (index) => {
         if (completedSteps[index] || index <= currentStep) {
             setCurrentStep(index);
@@ -25,7 +25,18 @@ export default function Sidebar({ currentStep, handlePrevStep, setCurrentStep, c
     };
 
     return (
-        <aside className="w-full bg-gradient-to-b from-gray-800 to-purple-900 p-6 md:w-1/4 md:p-6">
+        <aside className={`
+                    fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-gray-800 to-purple-900 p-6
+                    transform transition-transform duration-300 ease-in-out
+                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    md:relative md:translate-x-0 md:w-1/4
+        `}>
+            <button
+                className="absolute top-4 right-4 md:hidden"
+                onClick={() => setIsSidebarOpen(false)}
+            >
+                Close
+            </button>
             <h2 className="text-2xl font-bold mb-2">Simply Big</h2>
             <p className="text-sm text-gray-400 mb-8">Get a unique, physical U.S address and virtual mailbox.</p>
             <ol className="space-y-6">
