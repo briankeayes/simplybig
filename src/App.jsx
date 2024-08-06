@@ -6,6 +6,7 @@ import { API_URL } from "./constants";
 export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState({});
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     // SIM selection
     simType: null,
@@ -89,6 +90,8 @@ export default function App() {
           handlePrevStep={handlePrevStep}
           setCurrentStep={setCurrentStep}
           completedSteps={completedSteps}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
         />
         <MainContent
           currentStep={currentStep}
