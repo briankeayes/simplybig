@@ -282,7 +282,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                                 variant={formData.preferredContactMethod === "Email" ? "solid" : "bordered"}
                                 isDisabled={isSubmitted || isLoading}
                                 className="flex-1"
-                                onClick={() => handleContactMethod("Email")}
+                                onClick={() => handleContactMethod("EMAIL")}
                             >
                                 Email
                             </Button>

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Welcome from "./steps/Welcome";
 import SelectSimType from "./steps/SelectSimType";
@@ -14,17 +14,17 @@ import { Button, Card, CardBody } from "@nextui-org/react";
 
 const SuccessOverlay = ({ custNo, onClose }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Card className="w-96">
-        <CardBody className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Account Created Successfully!</h2>
-          <p className="mb-4">Your customer number is:</p>
-          <p className="text-3xl font-bold mb-6">{custNo}</p>
-          <Button color="primary" className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500" onClick={onClose}>Continue</Button>
-        </CardBody>
-      </Card>
+        <Card className="w-96">
+            <CardBody className="text-center">
+                <h2 className="text-2xl font-bold mb-4">Account Created Successfully!</h2>
+                <p className="mb-4">Your customer number is:</p>
+                <p className="text-3xl font-bold mb-6">{custNo}</p>
+                <Button color="primary" className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500" onClick={onClose}>Continue</Button>
+            </CardBody>
+        </Card>
     </div>
-  );
-  
+);
+
 export default function MainContent({ currentStep, handleNextStep, handlePrevStep, formData, updateFormData, handleSubmit }) {
     const [isAccountDetailsValid, setIsAccountDetailsValid] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +34,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
 
 
     const handleAccountDetailsSubmit = async () => {
-        if (isSubmitted){
+        if (isSubmitted) {
             return handleNextStep();
         }
         if (isAccountDetailsValid) {
@@ -52,7 +52,8 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
                     firstName: formData.firstName,
                     surname: formData.surname,
                     preferredContactMethod: formData.preferredContactMethod,
-                    sal: formData.sal
+                    sal: formData.sal,
+                    orderNotificationEmail: formData.email,
                 };
 
                 const response = await fetch(`${API_URL}/addCustomer`, {
@@ -69,12 +70,12 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
 
                 const data = await response.json();
                 console.log('API Response:', data);
-                
+
                 // Save the customer number in the state
                 setCustNo(data.return.custNo);
                 setIsSubmitted(true);
                 updateFormData('custNo', data.return.custNo);
-                
+
                 // Show the success overlay
                 setShowSuccessOverlay(true);
             } catch (error) {
@@ -111,7 +112,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
             case 4: return <SelectPlan {...props} />;
             case 5: return <SelectNumber {...props} />;
             case 6: return <Results {...props} />;
-            
+
             default: return <div>Step not implemented yet</div>;
         }
     };
