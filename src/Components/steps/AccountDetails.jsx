@@ -278,8 +278,8 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                         <h2 className="text-sm font-medium text-gray-600">Preferred Contact Method</h2>
                         <div className="flex gap-4">
                             <Button
-                                color={formData.preferredContactMethod === "Email" ? "primary" : "default"}
-                                variant={formData.preferredContactMethod === "Email" ? "solid" : "bordered"}
+                                color={formData.preferredContactMethod === "EMAIL" ? "primary" : "default"}
+                                variant={formData.preferredContactMethod === "EMAIL" ? "solid" : "bordered"}
                                 isDisabled={isSubmitted || isLoading}
                                 className="flex-1"
                                 onClick={() => handleContactMethod("EMAIL")}
