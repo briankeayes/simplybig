@@ -258,7 +258,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                         <OtpInput
                             value={otp}
                             onChange={setOtp}
-                            length={5}
+                            length={6}
                         />
                         {otpError && <p className="text-red-500 mt-4 text-center">{otpError}</p>}
                         {!otpError && otp.length === 5 && (
