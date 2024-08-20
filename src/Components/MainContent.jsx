@@ -152,7 +152,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
     };
 
     return (
-        <main className="flex-1 flex items-center justify-center p-4 md:p-6 overflow-y-auto">
+        <main className="flex-1 flex items-center justify-center p-4 md:p-6 overflow-y-auto bg-brand-gradient bg-opacity-20">
             <div className="w-full max-w-4xl flex flex-col min-h-[80vh] justify-center">
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -162,7 +162,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
                         exit="out"
                         variants={pageVariants}
                         transition={pageTransition}
-                        className="flex-grow flex flex-col justify-center"
+                        className="flex-grow flex flex-col justify-center bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6"
                     >
                         {renderStep()}
                     </motion.div>

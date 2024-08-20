@@ -185,7 +185,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             onChange={handleInputChange}
             variant="bordered"
             errorMessage={errors[name]}
-            isInvalid={!!errors[name]}
+            isInvalid={!!errors[name] || formData[name]===''}
             isDisabled={isSubmitted || isLoading}
             type={type}
             placeholder={placeholder}
@@ -195,26 +195,24 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
     return (
         <Card className="w-full max-w-2xl mx-auto">
             {isLoading && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-midnight bg-opacity-50 flex text-white items-center justify-center z-50">
                     <Spinner label="Adding customer..." color="white" />
                 </div>
             )}
             {isSubmitted && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <Card className="w-96">
-                            <CardBody className="text-center">
-                                <h2 className="text-2xl font-bold mb-4">Account Created Successfully!</h2>
-                                <p className="mb-4">Your customer number is:</p>
-                                <p className="text-3xl font-bold mb-6 ">{formData.custNo}</p>
-                            </CardBody>
-                        </Card>
-                    </div>
+                <div className="fixed inset-0 bg-midnight bg-opacity-50 flex items-center justify-center z-50">
+                    <Card className="w-96 bg-white">
+                        <CardBody className="text-center">
+                            <h2 className="text-2xl font-bold mb-4 text-midnight">Account Created Successfully!</h2>
+                            <p className="mb-4 text-ocean">Your customer number is:</p>
+                            <p className="text-3xl font-bold mb-6 text-indigo">{formData.custNo}</p>
+                        </CardBody>
+                    </Card>
                 </div>
             )}
-            <CardBody className="p-8">
-                <h1 className="text-3xl font-bold text-center mb-2">Create Your Account</h1>
-                <p className="text-center text-gray-400 mb-8">Enter your personal information.</p>
+            <CardBody className="p-8 ">
+                <h1 className="text-3xl font-bold text-center mb-2 text-midnight">Create Your Account</h1>
+                <p className="text-center text-ocean mb-8">Enter your personal information.</p>
                 <form className="space-y-6">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {renderField("firstName", "First Name", "Type your first name here")}

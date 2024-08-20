@@ -1,3 +1,4 @@
+//App.jsx
 import { useState } from "react";
 import Sidebar from "./Components/Sidebar";
 import MainContent from "./Components/MainContent";
@@ -70,9 +71,10 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+    <div className="flex flex-col min-h-screen bg-ocean text-white">
       <div className="flex flex-1">
         <Sidebar
+          formData={formData}
           currentStep={currentStep}
           handlePrevStep={handlePrevStep}
           setCurrentStep={setCurrentStep}

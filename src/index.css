@@ -6,6 +6,15 @@
 body {
   @apply bg-gray-100 text-gray-900;
 }
+:root {
+  --color-midnight: #0A0045;
+  --color-ocean: #2264DC;
+  --color-indigo: #6795FF;
+  --color-aqua: #018402;
+  --color-cloud-nine: #E4F1FF;
+  --color-white: #FFFFFF;
+  --color-iris: #9747FF;
+}
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

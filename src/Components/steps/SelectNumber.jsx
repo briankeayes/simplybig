@@ -197,8 +197,8 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
     };
     return (
         <div className="w-full max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold text-center mb-4">Select Your Number</h1>
-            <p className="text-center text-gray-400 mb-6">Choose your new phone number or enter your existing one.</p>
+            <h1 className="text-3xl font-bold text-center text-white mb-4">Select Your Number</h1>
+            <p className="text-center text-ocean mb-6">Choose your new phone number or enter your existing one.</p>
             {formData.numberType === "new" ? (
                 <>
                     {isLoading && availableNumbers.length === 0 ? (
