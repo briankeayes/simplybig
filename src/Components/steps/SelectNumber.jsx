@@ -108,7 +108,8 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
             });
             if (!response.ok) throw new Error('Failed to get OTP');
             const data = await response.json();
-            setTransactionId(data.transactionId);
+            setTransactionId(data.return.getOtp.transactionId);
+            // console.log(data,transactionId)
             setShowOtpModal(true);
             setTimer(300); // Reset timer to 5 minutes
             setOtp(''); // Clear previous OTP
@@ -122,7 +123,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
     };
 
     const handleVerifyOtp = async () => {
-        if (otp.length !== 5) return;
+        if (otp.length !== 6) return;
         setIsLoading(true);
         try {
             const response = await fetch(`${API_URL}/verifyOTP`, {
@@ -194,7 +195,6 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
 
         return <div className="grid grid-cols-2 gap-4 mb-6">{buttons}</div>;
     };
-    console.log(formData)
     return (
         <div className="w-full max-w-2xl mx-auto">
             <h1 className="text-3xl font-bold text-center mb-4">Select Your Number</h1>
@@ -251,7 +251,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                     <ModalHeader className="flex flex-col items-center">
                         <h3 className="text-lg font-semibold">Enter Your OTP</h3>
                         <p className="text-sm text-gray-500 text-center mt-2">
-                            Please enter the 5-digit one-time password sent to your device.
+                            Please enter the 6-digit one-time password sent to your device.
                         </p>
                     </ModalHeader>
                     <ModalBody className="flex flex-col items-center">
@@ -261,15 +261,15 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                             length={6}
                         />
                         {otpError && <p className="text-red-500 mt-4 text-center">{otpError}</p>}
-                        {!otpError && otp.length === 5 && (
+                        {/* {!otpError && otp.length === 5 && (
                             <p className="text-green-500 mt-4 text-center">OTP entered successfully!</p>
-                        )}
+                        )} */}
                         <div className="flex flex-col items-center w-full mt-6">
                             <Button
                                 color="primary"
                                 onClick={handleVerifyOtp}
                                 isLoading={isLoading}
-                                isDisabled={otp.length !== 5}
+                                isDisabled={otp.length !== 6}
                                 className="w-full mb-4"
                             >
                                 Confirm OTP

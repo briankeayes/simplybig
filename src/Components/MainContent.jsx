@@ -101,17 +101,17 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
         };
         switch (currentStep) {
             case 0: return <Welcome {...props} />;
-            case 1: return <SelectSimType {...props} />;
-            case 2: return <SelectNumberType {...props} />;
-            case 3: return <AccountDetails
+            // case 1: return <SelectSimType {...props} />;
+            case 1: return <SelectNumberType {...props} />;
+            case 2: return <AccountDetails
                 {...props}
                 isLoading={isLoading}
                 isSubmitted={isSubmitted}
                 onValidationChange={setIsAccountDetailsValid}
             />;
-            case 4: return <SelectPlan {...props} />;
-            case 5: return <SelectNumber {...props} />;
-            case 6: return <Results {...props} />;
+            case 3: return <SelectPlan {...props} />;
+            case 4: return <SelectNumber {...props} />;
+            case 5: return <Results {...props} />;
 
             default: return <div>Step not implemented yet</div>;
         }
@@ -120,19 +120,19 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
     const getNextButtonDisabledState = (step, formData) => {
         switch (step) {
             case 0: return false; // Welcome screen
-            case 1: return !formData.simType;
-            case 2: return !formData.numberType;
-            case 3: return !isAccountDetailsValid || isLoading;
-            case 4: return !formData.selectedPlan;
-            case 5: return !formData.selectedNumber && formData.numberType === 'new';
+            // case 1: return !formData.simType;
+            case 1: return !formData.numberType;
+            case 2: return !isAccountDetailsValid || isLoading;
+            case 3: return !formData.selectedPlan;
+            case 4: return !formData.selectedNumber && formData.numberType === 'new';
             default: return false;
         }
     };
 
     const getNextButtonHandler = (step) => {
         switch (step) {
-            case 3: return handleAccountDetailsSubmit;
-            case 6: return handleSubmit;
+            case 2: return handleAccountDetailsSubmit;
+            case 5: return handleSubmit;
             default: return handleNextStep;
         }
     };

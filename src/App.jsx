@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Sidebar from "./Components/Sidebar";
 import MainContent from "./Components/MainContent";
 import { API_URL } from "./constants";
@@ -9,7 +9,7 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     // SIM selection
-    simType: null,
+    simType: "physical",
 
     // Number selection
     numberType: null,
@@ -48,7 +48,7 @@ export default function App() {
   const handleFinalSubmit = async () => {
     try {
       // Here you would typically send the formData to your server
-      const response = await fetch(`${API_URL}/CreateOrder`, {
+      const response = await fetch(`${API_URL}/activateNumber`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
