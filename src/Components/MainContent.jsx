@@ -123,7 +123,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
             // case 1: return !formData.simType;
             case 1: return !formData.numberType;
             case 2: return !isAccountDetailsValid || isLoading;
-            case 3: return !formData.selectedPlan;
+            // case 3: return !formData.selectedPlan;
             case 4: return !formData.selectedNumber && formData.numberType === 'new';
             default: return false;
         }

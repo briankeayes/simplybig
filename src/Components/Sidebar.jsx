@@ -9,7 +9,7 @@ export default function Sidebar({ formData, currentStep, handlePrevStep, setCurr
             "Welcome",
             "Select Number Type",
             "Account Details",
-            "Plans",
+            "International Plan",
         ];
 
         // if (formData && formData.numberType === "new") {
@@ -44,8 +44,7 @@ export default function Sidebar({ formData, currentStep, handlePrevStep, setCurr
             >
                 Close
             </button>
-            <h2 className="text-2xl font-bold mb-2 text-white">Simply Big</h2>
-            <p className="text-sm text-cloud-nine mb-8">Get a unique, physical U.S address and virtual mailbox.</p>
+            <img src="/logo.svg" className="max-w-[50%] mb-10"/>
             <ol className="space-y-6">
                 {steps.map((step, index) => (
                     <li
@@ -92,7 +91,7 @@ function getStepDescription(index) {
         "Choose between new number or existing number",
         "Enter your personal information",
         // "Tell us about your business",
-        "Choose your plan",
+        "Upgrade your plan",
         "Choose your phone number",
         "Your registration is complete"
     ];

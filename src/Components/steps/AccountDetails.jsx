@@ -189,6 +189,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             isDisabled={isSubmitted || isLoading}
             type={type}
             placeholder={placeholder}
+            required={true}
         />
     );
 
@@ -196,7 +197,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
         <Card className="w-full max-w-2xl mx-auto">
             {isLoading && (
                 <div className="fixed inset-0 bg-midnight bg-opacity-50 flex text-white items-center justify-center z-50">
-                    <Spinner label="Adding customer..." color="white" />
+                    <Spinner label="Adding customer..." className="text-white" color="white" />
                 </div>
             )}
             {isSubmitted && (
@@ -221,7 +222,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {renderField("email", "Email", "email@company.com", 'email')}
 
-                        {renderField("phoneNumber", "Phone Number", "Enter your phone number", 'email')}
+                        {renderField("phoneNumber", "Phone Number", "Enter your phone number", 'text')}
 
                     </div>
 

@@ -218,7 +218,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                     >
                         {isLoading ? "Loading More Numbers..." : "Get More Numbers"}
                     </Button>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-white-200">
                         Total numbers available: {availableNumbers.length}
                     </div>
                 </>

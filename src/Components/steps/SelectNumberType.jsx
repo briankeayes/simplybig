@@ -1,5 +1,5 @@
-import React from "react";
-import { Button } from "@nextui-org/react";
+import React, {useState} from "react";
+import { Input, Button } from "@nextui-org/react";
 
 export default function SelectNumberType({ updateFormData, formData, handleNextStep }) {
     const handleNumberTypeChange = (type) => {
@@ -7,16 +7,44 @@ export default function SelectNumberType({ updateFormData, formData, handleNextS
         handleNextStep();
     };
 
+    // const [errors, setErrors] = useState("");
+    // const handleInputChange = (e) => {
+    //     const { name, value } = e.target;
+    //     let newErrors=''
+    //     const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
+    //     if (!value.trim()) {
+    //         newErrors = "Phone number is required";
+    //     } else if (!phoneRegex.test(value)) {
+    //         newErrors = "Invalid Australian phone number format";
+    //     } else {
+    //         newErrors = null;
+    //     }
+    //     setErrors(newErrors)
+    //     updateFormData(name, value);
+    // };
+
     return (
         <div className="w-full max-w-2xl mx-auto p-6 rounded-lg">
             <h1 className="text-3xl font-bold text-center mb-4 text-white">Select Number Type</h1>
             <p className="text-center text-ocean mb-6">Choose between new number or existing number</p>
             <div className="grid grid-cols-2 gap-4 mb-6">
+                {/* <Input
+                    label={"Phone Number"}
+                    name={"phoneNumber"}
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
+                    variant="bordered"
+                    errorMessage={errors}
+                    isInvalid={!!errors || formData["phoneNumber"] === ''}
+                    // isDisabled={isSubmitted || isLoading}
+                    type={"text"}
+                    placeholder={"Enter your phone number"}
+                /> */}
                 <Button
                     color={formData.numberType === "new" ? "primary" : "default"}
                     className={`px-6 py-3 rounded-full ${formData.numberType === "new"
-                            ? "bg-ocean text-white"
-                            : "bg-white text-midnight "
+                        ? "bg-ocean text-white"
+                        : "bg-white text-midnight "
                         }`}
                     onClick={() => handleNumberTypeChange("new")}
                 >
@@ -25,8 +53,8 @@ export default function SelectNumberType({ updateFormData, formData, handleNextS
                 <Button
                     color={formData.numberType === "existing" ? "primary" : "default"}
                     className={`px-6 py-3 rounded-full ${formData.numberType === "existing"
-                            ? "bg-ocean text-white"
-                            : "bg-white text-midnight "
+                        ? "bg-ocean text-white"
+                        : "bg-white text-midnight "
                         }`}
                     onClick={() => handleNumberTypeChange("existing")}
                 >

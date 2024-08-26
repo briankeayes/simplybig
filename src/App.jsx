@@ -28,6 +28,7 @@ export default function App() {
 
     // Plan selection
     selectedPlan: null,
+    isUpgraded: false,
 
     // Number selection (if new number)
     selectedState: null,
