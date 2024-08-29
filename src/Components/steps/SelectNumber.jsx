@@ -63,13 +63,25 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                 throw new Error('Failed to fetch numbers');
             }
             const data = await response.json();
+            if (data.numbers.length == 0) {
+                // setAvailableNumbers(prevNumbers => {
+                //     const newNumbers = [...prevNumbers, { id: "das", number: "90909090" }, { id: "da", number: "90909090" }];
+                //     updateFormData("availableNumbers", newNumbers);
+                //     return newNumbers;
+                // });
+                setAvailableNumbers(prevNumbers => ([...prevNumbers, { id: "das", number: "90909090" }, { id: "da", number: "90909090" }]));
+                setError(null);
+
+                // throw new Error('No numbers available right now.')
+            }
+
             setAvailableNumbers(prevNumbers => {
                 const newNumbers = [...prevNumbers, ...data.numbers];
                 updateFormData("availableNumbers", newNumbers);
                 return newNumbers;
             });
         } catch (err) {
-            setError('Failed to load numbers. Please try again.');
+            setError(err.message);
             console.error(err);
         } finally {
             setIsLoading(false);
@@ -82,7 +94,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
             fetchNumbers();
         }
     }, [formData.numberType, availableNumbers.length]);
-    
+
     useEffect(() => {
         let interval;
         if (showOtpModal && timer > 0) {
@@ -215,6 +227,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                         onClick={handleGetMoreNumbers}
                         className="w-full mb-6"
                         isLoading={isLoading}
+                    // isDisabled={!!error}
                     >
                         {isLoading ? "Loading More Numbers..." : "Get More Numbers"}
                     </Button>

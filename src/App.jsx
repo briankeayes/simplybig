@@ -11,6 +11,7 @@ export default function App() {
   const [formData, setFormData] = useState({
     // SIM selection
     simType: "physical",
+    simNumber: "",
 
     // Number selection
     numberType: null,
@@ -25,13 +26,18 @@ export default function App() {
     preferredContactMethod: "",
     dob: "",
     custType: "",
+    suburb: "",
+    state: "",
+    postcode: "",
 
     // Plan selection
     selectedPlan: null,
     isUpgraded: false,
 
+    paymentToken: '',
+
     // Number selection (if new number)
-    selectedState: null,
+    // selectedState: null,
     selectedNumber: null,
   });
   const handleNextStep = () => {
@@ -50,7 +56,7 @@ export default function App() {
   const handleFinalSubmit = async () => {
     try {
       // Here you would typically send the formData to your server
-      const response = await fetch(`${API_URL}/activateNumber`, {
+      const response = await fetch(`${API_URL}/activateNewNumber`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

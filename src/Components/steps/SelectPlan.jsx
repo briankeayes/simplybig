@@ -101,6 +101,7 @@ export default function SelectPlan({ updateFormData, formData, NavigationButtons
         </div>
     );
 }
+
 // function CheckIcon(props) {
 //     return (
 //         <svg

@@ -189,7 +189,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             isDisabled={isSubmitted || isLoading}
             type={type}
             placeholder={placeholder}
-            required={true}
+            isRequired
         />
     );
 
@@ -256,6 +256,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
 
                     </div>
                     <Input
+                        isRequired
                         ref={autocompleteInput}
                         label="Address"
                         name="address"

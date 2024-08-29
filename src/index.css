@@ -15,6 +15,10 @@ body {
   --color-white: #FFFFFF;
   --color-iris: #9747FF;
 }
+div[data-quickstream-api="bankAccountContainer"] > iframe {
+  height: 10rem;
+}
+/* document.querySelector('div[data-quickstream-api="bankAccountContainer"] > iframe').style.height='10rem' */
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
