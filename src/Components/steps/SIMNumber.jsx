@@ -5,17 +5,39 @@ import { Input } from "@nextui-org/react";
 export default function SimNumber({ title, description, updateFormData, formData, isFormSubmitted }) {
     const [errors, setErrors] = useState("");
 
+    // const handleInputChange = (e) => {
+    //     const { name, value } = e.target;
+
+    //     // Validate input to allow only numbers
+    //     if (/^\d*$/.test(value)) {
+    //         setErrors("");
+    //         updateFormData(name, value);
+    //     } else {
+    //         setErrors("Please enter numbers only");
+    //     }
+    // };
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-
-        // Validate input to allow only numbers
-        if (/^\d*$/.test(value)) {
-            setErrors("");
-            updateFormData(name, value);
+    
+        // Remove any non-digit characters
+        const numericValue = value.replace(/\D/g, '');
+    
+        // Validate input to allow only numbers and check length
+        if (/^\d*$/.test(numericValue)) {
+            if (numericValue.length > 13) {
+                setErrors("Please enter exactly 13 digits");
+            } else if (numericValue.length === 13) {
+                setErrors("");
+                updateFormData(name, numericValue);
+            } else {
+                setErrors(`Please enter ${13 - numericValue.length} more digit(s)`);
+                updateFormData(name, numericValue);
+            }
         } else {
             setErrors("Please enter numbers only");
         }
     };
+    
 
     return (
         <div className="w-full max-w-2xl mx-auto p-6 rounded-lg">
