@@ -1,12 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Modal, ModalContent, Text, Link, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Card, CardBody, Spinner, Chip } from "@nextui-org/react";
-import { HeartIcon } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Modal, ModalContent, Link, ModalHeader, ModalBody, ModalFooter, Button, Card, CardBody, Spinner, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import { LockIcon } from "lucide-react";
 import { API_URL } from "../../constants";
+import PropTypes from 'prop-types';
 
 const CheckIcon = ({
-    size,
-    height,
-    width,
+    size = 18,
+    height = 24,
+    width = 24,
     ...props
 }) => {
     return (
@@ -22,7 +23,8 @@ const CheckIcon = ({
         </svg>
     );
 };
-export default function Payment({ updateFormData, formData, NavigationButtons }) {
+
+export default function Payment({ title, description, updateFormData, formData, isFormSubmitted }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const creditCardFrameRef = useRef(null);
@@ -30,8 +32,8 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
     const [paymentMethod, setPaymentMethod] = useState("credit");
     const [isScriptLoaded, setIsScriptLoaded] = useState(false);
     const [isBankSelected, setIsBankSelected] = useState(false);
-    const [isFormValid, setIsFormValid] = useState(false);
     const [isBankNote, setIsBankNote] = useState(false);
+    const [errorMsg, setErrorMsg] = useState([]);
 
     const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
@@ -45,22 +47,7 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
 
     const supplierBusinessCode = "QUICKSTREAMDEMO";
 
-    const options = {
-        config: {
-            supplierBusinessCode: supplierBusinessCode,
-        },
-        iframe: {
-            width: "100%",
-            height: "100%",
-            style: {
-                "font-size": "14px",
-                "line-height": "24px",
-                "min-height": "22rem",
-                width: "300px",
-                color: 'white'
-            },
-        },
-    };
+
 
     useEffect(() => {
 
@@ -92,13 +79,29 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
         };
 
         initializeQuickstream();
-    }, [scriptUrl, publishableApiKey]);
+    }, [scriptUrl, publishableApiKey, formData.paymentToken]);
 
     useEffect(() => {
         if (!isScriptLoaded) return;
 
         if (formData.paymentToken) return;
 
+        const options = {
+            config: {
+                supplierBusinessCode: supplierBusinessCode,
+            },
+            iframe: {
+                width: "100%",
+                height: "100%",
+                style: {
+                    "font-size": "14px",
+                    "line-height": "24px",
+                    "min-height": "22rem",
+                    width: "300px",
+                    color: 'white'
+                },
+            },
+        };
 
         const createTrustedFrames = () => {
             setIsSubmitting(true);
@@ -122,7 +125,7 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
         };
 
         createTrustedFrames();
-    }, [isScriptLoaded]);
+    }, [formData.paymentToken, isScriptLoaded]);
 
 
     const handleTrustedFrameCallback = (errors, data, frameType) => {
@@ -166,6 +169,9 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
             // updateFormData('paymentCompleted', true);
         } catch (error) {
             console.error("Payment failed:", error);
+
+            setErrorMsg(error)
+
         } finally {
             setShowLoadingOverlay(false);
         }
@@ -173,14 +179,13 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
 
     const handlePaymentMethodChange = (isChecked) => {
         setPaymentMethod(isChecked ? "bank" : "credit");
-        setIsFormValid(false);  // Reset form validity when switching payment method
     };
 
     useEffect(() => {
         handlePaymentMethodChange(isBankSelected);
     }, [isBankSelected]);
 
-    const attachPaymentMethod = async (paymentTokenId: string, custNo: string) => {
+    const attachPaymentMethod = async (paymentTokenId, custNo) => {
         try {
             setShowLoadingOverlay(true);
 
@@ -203,22 +208,33 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
         }
     }
 
-    // useEffect(() => {
-    //     if (!paymentSuccess) return;
-    //     attachPaymentMethod(formData.paymentToken, formData.custNo)
-    // }, [paymentSuccess]);
+    useEffect(() => {
+        if (!paymentSuccess || !formData.paymentToken || !formData.custNo) return;
+        attachPaymentMethod(formData.paymentToken, formData.custNo)
+    }, [formData.custNo, formData.paymentToken, paymentSuccess]);
 
     return (
         <div className="w-full max-w-4xl mx-auto relative">
-            <h1 className="text-3xl text-center text-white mb-4">Add your Payment method</h1>
-            <p className="text-center text-iris text-xl">
-                {/* add a payment */}
-            </p>
+            <h1 className="text-3xl font-bold text-center mb-4 text-white">{title}</h1>
+            <p className="text-center mb-6">{description}</p>
+            <div className="flex flex-row content-center justify-center mb-4">
+                <Popover showArrow backdrop="blur">
+                    <PopoverTrigger>
+                        <Button size="sm" color="success"><LockIcon /> PROTECTED IN VAULT</Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                        <div className="px-1 py-2">
+                            <div className="text-small font-bold">Vault</div>
+                            <div className="text-tiny max-w-32">Data collected via fields that have our security seal are encrypted and stored with the highest global security standard — PCI compliance. Your data is absolutely safe in Vault.</div>
+                        </div>
+                    </PopoverContent>
+                </Popover>
 
+            </div>
 
             {(paymentSuccess || formData.paymentToken) && (
                 <div className="fixed inset-0 bg-midnight bg-opacity-50 flex items-center justify-center z-50">
-                    <Card className="w-96 bg-iris/90">
+                    <Card className="w-96 bg-aqua/90">
                         <CardBody className="text-center">
                             <h2 className="text-2xl font-bold mb-4 text-white">Payment method added successfully!</h2>
                         </CardBody>
@@ -230,11 +246,12 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
             <div className="flex justify-center items-center mb-6 space-x-4">
                 <Button
                     radius="full"
+                    isDisabled={isFormSubmitted}
                     onClick={() => (setIsBankSelected(false))}
                     className={`${paymentMethod === 'credit'
                         ? "bg-gradient-to-br from-indigo to-pink-500"
                         : "bg-gradient-to-br from-gray-300 to-gray-400"}`}
-                    startContent={paymentMethod === 'credit' ? <CheckIcon size={18} /> : null}
+                    startContent={paymentMethod === 'credit' ? <CheckIcon /> : null}
                 >
                     Credit Card
                 </Button>
@@ -245,12 +262,13 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
                     /> */}
 
                 <Button
+                    isDisabled={isFormSubmitted}
                     radius="full"
                     onClick={() => (setIsBankSelected(true))}
                     className={`${paymentMethod === 'bank'
                         ? "bg-gradient-to-br from-indigo to-pink-500"
                         : "bg-gradient-to-br from-gray-300 to-gray-400 "}`}
-                    startContent={paymentMethod === 'bank' ? <CheckIcon size={18} /> : null}
+                    startContent={paymentMethod === 'bank' ? <CheckIcon /> : null}
                 >
                     Bank Account
                 </Button>
@@ -279,11 +297,10 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
                     <div className={`${paymentMethod === 'bank' ? '' : 'hidden'} border p-4 rounded`} data-quickstream-api="bankAccountContainer"></div>
                 </div>
                 <div className="flex justify-center mt-6">
-                    <Button color="secondary" type="submit" disabled={isSubmitting}>Pay</Button>
+                    <Button className="bg-aqua" variant="bordered" type="submit" isDisabled={isSubmitting || isFormSubmitted}>Pay</Button>
                 </div>
             </form>
 
-            {NavigationButtons}
 
             {showLoadingOverlay && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -304,7 +321,7 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
 
             <Modal isOpen={isBankNote} onClose={() => { setIsBankNote(false) }} scrollBehavior="inside">
                 <ModalContent>
-                    {(onClose) => (
+                    {() => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">Direct Debit Note</ModalHeader>
                             <ModalBody>
@@ -341,7 +358,50 @@ export default function Payment({ updateFormData, formData, NavigationButtons })
                     )}
                 </ModalContent>
             </Modal>
+            <Modal isOpen={errorMsg.length > 0} onClose={() => { setErrorMsg([]) }} >
+                <ModalContent>
+                    {() => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Payment Error</ModalHeader>
+                            <ModalBody className="gap-0">
+                                <h3 className="mb-4 text-xl font-bold">
+                                    Following error occured while processing your payment:
+                                </h3>
+                                {errorMsg.map((err) => (
+                                    <>
+                                        <p className="mt-4 underline">{String(err.fieldName).toLocaleUpperCase()} Error: </p>
+                                        <ol className="mt-0 indent-10">
+                                            {err.messages.map((msg, i) => (
+                                                <li key={i}> - {msg} </li>
+                                            ))}
+                                        </ol>
+                                    </>
+                                ))}
+                            </ModalBody>
+                            <ModalFooter />
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
 
         </div>
     );
 }
+
+Payment.propTypes = {
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    updateFormData: PropTypes.func.isRequired,
+    formData: PropTypes.shape({
+        // numberType: PropTypes.oneOf(['new','existing'])
+        custNo: PropTypes.string.isRequired,
+        paymentToken: PropTypes.string,
+    }).isRequired,
+    isFormSubmitted: PropTypes.bool.isRequired
+};
+
+CheckIcon.propTypes = {
+    size: PropTypes.number,
+    height: PropTypes.number,
+    width: PropTypes.number,
+};

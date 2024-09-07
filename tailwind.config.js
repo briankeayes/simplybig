@@ -13,7 +13,7 @@ module.exports = {
         midnight: '#0A0045',
         ocean: '#2264DC',
         indigo: '#6795FF',
-        aqua: '#018402',
+        aqua: '#0184D2',
         'cloud-nine': '#E4F1FF',
         white: '#FFFFFF',
         iris: '#9747FF', // Added for the gradient, adjust if needed

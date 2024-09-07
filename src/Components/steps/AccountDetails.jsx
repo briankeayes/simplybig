@@ -1,23 +1,39 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
+import PropTypes from 'prop-types';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Card, CardBody, Spinner } from "@nextui-org/react";
 
-export default function AccountDetails({ updateFormData, formData, onValidationChange, isLoading, isSubmitted }) {
+AccountDetails.propTypes = {
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    updateFormData: PropTypes.func.isRequired,
+    formData: PropTypes.shape({
+        firstName: PropTypes.string,
+        surname: PropTypes.string,
+        email: PropTypes.string,
+        phoneNumber: PropTypes.string,
+        sal: PropTypes.string,
+        dob: PropTypes.string,
+        address: PropTypes.string,
+        suburb: PropTypes.string,
+        state: PropTypes.string,
+        postcode: PropTypes.string,
+        preferredContactMethod: PropTypes.oneOf(['EMAIL', 'SMS', '']),
+        custType: PropTypes.oneOf(['B', 'R', '']),
+        abn: PropTypes.string,
+        custNo: PropTypes.string // For the success message
+    }).isRequired,
+    onValidationChange: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    isSubmitted: PropTypes.bool.isRequired,
+    isFormSubmitted: PropTypes.bool.isRequired,
+};
+
+export default function AccountDetails({ title, description, updateFormData, formData, onValidationChange, isLoading, isSubmitted, isFormSubmitted }) {
     const salutations = ["Mr", "Mrs", "Ms", "Mstr", "Miss", "Dr", "Mx", "Other"];
     const autocompleteInput = useRef(null);
     const [errors, setErrors] = useState({});
-
-    useEffect(() => {
-        // Load Google Maps JavaScript API script
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAUKRbwl61ZS5CfzHB5L_KQeOdLAG2gFV8&libraries=places`;
-        script.async = true;
-        script.onload = initAutocomplete;
-        document.body.appendChild(script);
-
-        return () => {
-            document.body.removeChild(script);
-        };
-    }, []);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
 
     const initAutocomplete = () => {
         if (!autocompleteInput.current) return;
@@ -58,6 +74,20 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
         });
     };
 
+    useEffect(() => {
+        // Load Google Maps JavaScript API script
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAUKRbwl61ZS5CfzHB5L_KQeOdLAG2gFV8&libraries=places`;
+        script.async = true;
+        script.onload = initAutocomplete;
+        document.body.appendChild(script);
+
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, [initAutocomplete]);
+
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         updateFormData(name, value);
@@ -92,7 +122,6 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                 }
                 break;
             case "email":
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!value.trim()) {
                     newErrors.email = "Email is required";
                 } else if (!emailRegex.test(value)) {
@@ -151,7 +180,6 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                 }
                 break;
             case "phoneNumber":
-                const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
                 if (!value.trim()) {
                     newErrors.phoneNumber = "Phone number is required";
                 } else if (!phoneRegex.test(value)) {
@@ -166,16 +194,17 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
         setErrors(newErrors);
     };
 
-    const validateForm = () => {
-        const requiredFields = ['firstName', 'surname', 'email', 'address', 'postcode', 'state', 'suburb', 'custType', 'dob', 'preferredContactMethod', 'sal'];
-        const isValid = requiredFields.every(field => formData[field]) && Object.keys(errors).length === 0;
-        onValidationChange(isValid);
-        return isValid;
-    };
 
     useEffect(() => {
+        const validateForm = () => {
+            const requiredFields = ['firstName', 'surname', 'email', 'address', 'postcode', 'state', 'suburb', 'custType', 'dob', 'preferredContactMethod', 'sal'];
+            const isValid = requiredFields.every(field => formData[field]) && Object.keys(errors).length === 0;
+            onValidationChange(isValid);
+            return isValid;
+        };
+
         validateForm();
-    }, [formData, errors]);
+    }, [formData, errors, onValidationChange]);
 
     const renderField = (name, label, placeholder, type = "text") => (
         <Input
@@ -185,8 +214,8 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             onChange={handleInputChange}
             variant="bordered"
             errorMessage={errors[name]}
-            isInvalid={!!errors[name] || formData[name]===''}
-            isDisabled={isSubmitted || isLoading}
+            isInvalid={!!errors[name] || formData[name] === ''}
+            isDisabled={isSubmitted || isLoading || isFormSubmitted}
             type={type}
             placeholder={placeholder}
             isRequired
@@ -212,8 +241,8 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                 </div>
             )}
             <CardBody className="p-8 ">
-                <h1 className="text-3xl font-bold text-center mb-2 text-midnight">Create Your Account</h1>
-                <p className="text-center text-ocean mb-8">Enter your personal information.</p>
+                <h1 className="text-3xl font-bold text-center mb-2 text-midnight">{title}</h1>
+                <p className="text-center mb-8">{description}</p>
                 <form className="space-y-6">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {renderField("firstName", "First Name", "Type your first name here")}
@@ -230,15 +259,16 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                         <Dropdown size={"md"}>
                             <DropdownTrigger>
                                 <Button
-                                    isDisabled={isSubmitted || isLoading}
+                                    isDisabled={isSubmitted || isLoading || isFormSubmitted}
                                     variant="bordered"
                                     className={`w-full justify-start ${errors.sal ? 'border-red-500' : ''}`}
                                 >
                                     {formData.sal || "Select Salutation"}
+                                    {!formData.sal && (<span className='text-red-500'>*</span>)}
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
-                                aria-label="Salutation selection"
+                                aria-label="Salutation selection *"
                                 variant="flat"
                                 disallowEmptySelection
                                 selectionMode="single"
@@ -265,7 +295,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                         onChange={handleInputChange}
                         variant="bordered"
                         errorMessage={errors.address}
-                        isDisabled={isSubmitted || isLoading}
+                        isDisabled={isSubmitted || isLoading || isFormSubmitted}
                         isInvalid={!!errors.address}
                     />
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -275,19 +305,19 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
 
                     </div>
                     <div className="space-y-2">
-                        <h2 className="text-sm font-medium text-gray-600">Preferred Contact Method</h2>
+                        <h2 className="text-sm font-medium text-gray-600">Preferred Contact Method<span className='text-red-500'>*</span></h2>
                         <div className="flex gap-4">
                             <Button
                                 color={formData.preferredContactMethod === "EMAIL" ? "primary" : "default"}
                                 variant={formData.preferredContactMethod === "EMAIL" ? "solid" : "bordered"}
-                                isDisabled={isSubmitted || isLoading}
+                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
                                 className="flex-1"
                                 onClick={() => handleContactMethod("EMAIL")}
                             >
                                 Email
                             </Button>
                             <Button
-                                isDisabled={isSubmitted || isLoading}
+                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
                                 color={formData.preferredContactMethod === "SMS" ? "primary" : "default"}
                                 variant={formData.preferredContactMethod === "SMS" ? "solid" : "bordered"}
                                 className="flex-1"
@@ -299,10 +329,10 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                         {errors.preferredContactMethod && <p className="text-red-500 text-sm">{errors.preferredContactMethod}</p>}
                     </div>
                     <div className="space-y-2">
-                        <h2 className="text-sm font-medium text-gray-600">Customer Type</h2>
+                        <h2 className="text-sm font-medium text-gray-600">Customer Type<span className='text-red-500'>*</span></h2>
                         <div className="flex gap-4">
                             <Button
-                                isDisabled={isSubmitted || isLoading}
+                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
                                 color={formData.custType === "B" ? "primary" : "default"}
                                 variant={formData.custType === "B" ? "solid" : "bordered"}
                                 className="flex-1"
@@ -312,7 +342,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                             </Button>
                             <Button
                                 color={formData.custType === "R" ? "primary" : "default"}
-                                isDisabled={isSubmitted || isLoading}
+                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
                                 variant={formData.custType === "R" ? "solid" : "bordered"}
                                 className="flex-1"
                                 onClick={() => handleCustType("R")}

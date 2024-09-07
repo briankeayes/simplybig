@@ -26,7 +26,7 @@ const plans = [
     },
 ];
 
-export default function SelectPlan({ updateFormData, formData, NavigationButtons }) {
+export default function SelectPlan({ updateFormData, formData, NavigationButtons, isFormSubmitted }) {
 
     const [isEnabled, setIsEnabled] = useState(formData.isUpgraded || false);
 
@@ -38,8 +38,8 @@ export default function SelectPlan({ updateFormData, formData, NavigationButtons
 
     return (
         <div className="w-full max-w-4xl mx-auto">
-            <h1 className="text-3xl text-center text-white mb-4">Upgrade to the <br /><span className="font-bold">Unlimited International plan</span></h1>
-            <p className="text-center text-iris text-xl my-8">
+            <h1 className="text-3xl text-center text-white mb-4">Special Offer: <br /><span className="font-bold">Add unlimited calls and SMS to 14 countries</span></h1>
+            <p className="text-center text-aqua text-xl my-8">
                 {/* <br />
                 This upgrade gives you Unlimited calls to China, France, Germany, Greece, Hong Kong, India, Ireland, Malaysia, Singapore, South Korea, Thailand, the United Kingdom, the USA, and Vietnam.
                 <br />
@@ -47,13 +47,13 @@ export default function SelectPlan({ updateFormData, formData, NavigationButtons
                 {/* Upgrade today for only an extra $19/month (save $10/month).<br /><br /> */}
                 {/* Would you like to upgrade to the unlimited International plan? <br /> */}
             </p>
-            <div className="space-y-4 text-center">
+            <div className="space-y-4 text-center max-w-[37rem] align-middle content-center mx-auto">
                 <ul className="space-y-2 text-center">
                     {[
-                        "Unlimited calls to 14 countries",
-                        "Crystal-clear international calls",
-                        "24/7 priority customer support",
-                        "Flexible plan - modify anytime",
+                        "Upgrade today for $19/month (save 34%, usually $29/month)",
+                        "Includes China, France, Germany, Greece, Hong Kong, India, Ireland, Malaysia, Singapore, South Korea, Thailand, the United Kingdom, the USA, and Vietnam.",
+                        // "24/7 priority customer support",
+                        // "Flexible plan - modify anytime",
                     ].map((benefit, index) => (
                         <li key={index} className="flex justify-center items-center space-x-2 text-white-600 dark:text-white-400">
                             <Check className="h-5 w-5 bg-ocean p-1 rounded-full text-white font-bold" />
@@ -65,6 +65,7 @@ export default function SelectPlan({ updateFormData, formData, NavigationButtons
 
             <div className="flex justify-center items-center space-x-4 my-6">
                 <Switch
+                    isDisabled={isFormSubmitted}
                     classNames={{
                         base: cn(
                             "inline-flex flex-row-reverse w-full max-w-md bg-ocean hover:bg-ocean/80 items-center",
@@ -87,16 +88,16 @@ export default function SelectPlan({ updateFormData, formData, NavigationButtons
 
                 >
                     <div className="flex flex-col gap-1">
-                        <p className="text-medium text-white">Enable Unlimited International Plan</p>
-                        <p className="text-tiny text-white text-default-400">
+                        <p className="text-medium text-white">Add Unlimited International Calls & SMS to 14 countries</p>
+                        <p className="text-tiny text-white">
                             Upgrade today for only an extra $19/month (save $10/month).
                         </p>
                     </div>
                 </Switch>
             </div>
-            <div className="text-xs text-center text-white-200 max-w-prose mx-auto">
-                    14 countries include: <span className="italic">China, France, Germany, Greece, Hong Kong, India, Ireland, Malaysia, Singapore, South Korea, Thailand, the United Kingdom, the USA, and Vietnam.</span>
-                </div>
+            {/* <div className="text-xs text-center text-white-200 max-w-prose mx-auto">
+                14 countries include: <span className="italic">China, France, Germany, Greece, Hong Kong, India, Ireland, Malaysia, Singapore, South Korea, Thailand, the United Kingdom, the USA, and Vietnam.</span>
+            </div> */}
             {NavigationButtons}
         </div>
     );
@@ -182,7 +183,7 @@ export default function SelectPlan({ updateFormData, formData, NavigationButtons
 //                         <Switch
 //                             classNames={{
 //                                 base: cn(
-//                                     "inline-flex flex-row-reverse w-full max-w-md bg-ocean hover:bg-iris items-center",
+//                                     "inline-flex flex-row-reverse w-full max-w-md bg-ocean hover:bg-aqua items-center",
 //                                     "justify-between cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
 //                                     "data-[selected=true]:border-primary",
 //                                 ),

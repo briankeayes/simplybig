@@ -1,6 +1,16 @@
 //NavigationButtons.jsx
-import React from "react";
 import { Button } from "@nextui-org/react";
+import PropTypes from 'prop-types';
+
+
+NavigationButtons.propTypes = {
+  currentStep: PropTypes.number.isRequired,
+  handlePrevStep: PropTypes.func.isRequired,
+  handleNextStep: PropTypes.func.isRequired,
+  isNextDisabled: PropTypes.bool,
+  nextButtonText: PropTypes.string,
+  showNextButton: PropTypes.bool
+};
 
 export default function NavigationButtons({
   currentStep,
@@ -16,7 +26,7 @@ export default function NavigationButtons({
         <Button
           onClick={handlePrevStep}
           className="px-6 py-2 bg-indigo text-white 
-                     hover:bg-iris
+                     hover:bg-aqua
                      transition-all duration-300
                      border-2 border-transparent hover:border-cloud-nine"
         >
@@ -28,7 +38,7 @@ export default function NavigationButtons({
           onClick={handleNextStep}
           isDisabled={isNextDisabled}
           className={`px-6 py-2 bg-indigo text-white 
-                      hover:bg-iris
+                      hover:bg-aqua
                       transition-all duration-300
                       border-2 border-transparent hover:border-cloud-nine
                       ${currentStep === 0 ? 'ml-auto' : ''}

@@ -3,21 +3,24 @@ import { useState } from "react";
 import Sidebar from "./Components/Sidebar";
 import MainContent from "./Components/MainContent";
 import { API_URL } from "./constants";
+// import { getVisibleSteps } from "./Components/stepConfig";
 
 export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState({});
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isFormSubmitted, setFormSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     // SIM selection
     simType: "physical",
     simNumber: "",
 
     // Number selection
-    numberType: null,
-    newNumber: null,
-    existingNumber: null,
-
+    // numberType: "",
+    numberType: "new",
+    newNumber: "",
+    existingNumber: "",
+    availableNumbers:[],
     // Account details
     firstName: "",
     surname: "",
@@ -29,7 +32,7 @@ export default function App() {
     suburb: "",
     state: "",
     postcode: "",
-
+    phoneNumber: "",
     // Plan selection
     selectedPlan: null,
     isUpgraded: false,
@@ -40,6 +43,7 @@ export default function App() {
     // selectedState: null,
     selectedNumber: null,
   });
+
   const handleNextStep = () => {
     setCompletedSteps(prev => ({ ...prev, [currentStep]: true }));
     setCurrentStep(prevStep => prevStep + 1);
@@ -54,7 +58,9 @@ export default function App() {
   };
 
   const handleFinalSubmit = async () => {
+
     try {
+      if (isFormSubmitted) return;
       // Here you would typically send the formData to your server
       const response = await fetch(`${API_URL}/activateNewNumber`, {
         method: 'POST',
@@ -67,13 +73,16 @@ export default function App() {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
       const result = await response.json();
       console.log('Submission successful:', result);
+
       // Handle successful submission (e.g., show a success message, redirect user)
     } catch (error) {
       console.error('Error submitting form:', error);
       // Handle error (e.g., show error message to user)
+    } finally {
+      setFormSubmitted(true)
+      handleNextStep()
     }
   };
 
@@ -96,6 +105,7 @@ export default function App() {
           formData={formData}
           updateFormData={updateFormData}
           handleSubmit={handleFinalSubmit}
+          isFormSubmitted={isFormSubmitted}
         />
       </div>
     </div>

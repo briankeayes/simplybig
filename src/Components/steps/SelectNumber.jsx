@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
+import { useState, useEffect, useRef } from "react";
+import { Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
 import { API_URL } from "../../constants";
+import PropTypes from 'prop-types';
 
 const OtpInput = ({ value, onChange, length = 5 }) => {
     const inputs = useRef([]);
@@ -40,8 +41,7 @@ const OtpInput = ({ value, onChange, length = 5 }) => {
         </div>
     );
 };
-
-export default function SelectNumber({ updateFormData, formData, NavigationButtons }) {
+export default function SelectNumber({ title, description, updateFormData, formData, isFormSubmitted }) {
     const [availableNumbers, setAvailableNumbers] = useState(formData.availableNumbers || []);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -64,19 +64,17 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
             }
             const data = await response.json();
             if (data.numbers.length == 0) {
-                // setAvailableNumbers(prevNumbers => {
-                //     const newNumbers = [...prevNumbers, { id: "das", number: "90909090" }, { id: "da", number: "90909090" }];
-                //     updateFormData("availableNumbers", newNumbers);
-                //     return newNumbers;
-                // });
-                setAvailableNumbers(prevNumbers => ([...prevNumbers, { id: "das", number: "90909090" }, { id: "da", number: "90909090" }]));
+                setAvailableNumbers(prevNumbers => {
+                    const newNumbers = [...prevNumbers, { id: "das", number: "90909090" }, { id: "da", number: "90909090" }];
+                    updateFormData("availableNumbers", newNumbers);
+                    return newNumbers;
+                });
                 setError(null);
-
                 // throw new Error('No numbers available right now.')
             }
 
             setAvailableNumbers(prevNumbers => {
-                const newNumbers = [...prevNumbers, ...data.numbers];
+                const newNumbers = [...data.numbers, ...prevNumbers];
                 updateFormData("availableNumbers", newNumbers);
                 return newNumbers;
             });
@@ -170,7 +168,6 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
-
     const handleNumberSelect = (number) => {
         updateFormData("selectedNumber", number.number);
     };
@@ -184,9 +181,10 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
     };
 
     const renderNumberButtons = () => {
-        const buttons = availableNumbers.map((number) => (
+        const buttons = availableNumbers.map((number, i) => (
             <Button
-                key={number.id}
+                isDisabled={isFormSubmitted}
+                key={number.id + i}
                 color={formData.selectedNumber === number.number ? "primary" : "default"}
                 onClick={() => handleNumberSelect(number)}
                 className="py-6 text-lg font-semibold"
@@ -197,7 +195,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
 
         if (buttons.length > 8) {
             return (
-                <div className="max-h-96 overflow-y-auto pr-2 mb-4">
+                <div className="max-h-96 overflow-y-scroll pr-2 mb-4">
                     <div className="grid grid-cols-2 gap-4">
                         {buttons}
                     </div>
@@ -207,10 +205,11 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
 
         return <div className="grid grid-cols-2 gap-4 mb-6">{buttons}</div>;
     };
+
     return (
         <div className="w-full max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold text-center text-white mb-4">Select Your Number</h1>
-            <p className="text-center text-ocean mb-6">Choose your new phone number or enter your existing one.</p>
+            <h1 className="text-3xl font-bold text-center text-white mb-4">{title}</h1>
+            <p className="text-center mb-6">{description}</p>
             {formData.numberType === "new" ? (
                 <>
                     {isLoading && availableNumbers.length === 0 ? (
@@ -223,9 +222,10 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                         renderNumberButtons()
                     )}
                     <Button
-                        color="secondary"
+                        isDisabled={isFormSubmitted}
+                        // color="secondary"
                         onClick={handleGetMoreNumbers}
-                        className="w-full mb-6"
+                        className="w-full mb-6 bg-aqua"
                         isLoading={isLoading}
                     // isDisabled={!!error}
                     >
@@ -245,6 +245,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                         className="mb-6"
                     />
                     <Button
+                        isDisabled={isFormSubmitted}
                         color="primary"
                         onClick={handleGetOtp}
                         className="w-full mb-6"
@@ -254,7 +255,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                     </Button>
                 </>
             )}
-            {NavigationButtons}
+            {/* {NavigationButtons} */}
             <Modal
                 isOpen={showOtpModal}
                 onClose={() => setShowOtpModal(false)}
@@ -282,7 +283,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                                 color="primary"
                                 onClick={handleVerifyOtp}
                                 isLoading={isLoading}
-                                isDisabled={otp.length !== 6}
+                                isDisabled={otp.length !== 6 || isFormSubmitted}
                                 className="w-full mb-4"
                             >
                                 Confirm OTP
@@ -291,7 +292,7 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
                                 color="secondary"
                                 onClick={handleGetOtp}
                                 isLoading={isLoading}
-                                isDisabled={timer > 0}
+                                isDisabled={timer > 0 || isFormSubmitted}
                                 className="w-full"
                             >
                                 {timer > 0 ? `Resend OTP (${formatResendTime()})` : 'Resend OTP'}
@@ -303,3 +304,28 @@ export default function SelectNumber({ updateFormData, formData, NavigationButto
         </div>
     );
 }
+
+SelectNumber.propTypes = {
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    updateFormData: PropTypes.func.isRequired,
+    formData: PropTypes.shape({
+        // numberType: PropTypes.oneOf(['new','existing'])
+        availableNumbers: PropTypes.array,
+        custNo: PropTypes.string,
+        phoneNumber: PropTypes.string,
+        selectedNumber: PropTypes.string,
+        numberType: PropTypes.oneOf(["new", "existing"])
+    }).isRequired,
+    isFormSubmitted: PropTypes.bool.isRequired
+};
+
+OtpInput.propTypes = {
+    value: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    length: PropTypes.number
+};
+
+OtpInput.defaultProps = {
+    length: 5
+};

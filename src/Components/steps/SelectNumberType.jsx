@@ -1,48 +1,29 @@
-import React, { useState } from "react";
-import { Input, Button } from "@nextui-org/react";
+import PropTypes from 'prop-types';
+import { Button } from "@nextui-org/react";
 
-export default function SelectNumberType({ updateFormData, formData, handleNextStep }) {
+SelectNumberType.propTypes = {
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    updateFormData: PropTypes.func.isRequired,
+    formData: PropTypes.shape({
+        numberType: PropTypes.oneOf(['new','existing',''])
+    }).isRequired,
+    handleNextStep: PropTypes.func.isRequired,
+    isFormSubmitted: PropTypes.bool.isRequired,
+};
+export default function SelectNumberType({ title, description, updateFormData, formData, handleNextStep, isFormSubmitted }) {
     const handleNumberTypeChange = (type) => {
         updateFormData("numberType", type);
         handleNextStep();
     };
 
-    const [errors, setErrors] = useState("");
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        // let newErrors=''
-        // const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
-        // if (!value.trim()) {
-        //     newErrors = "Phone number is required";
-        // } else if (!phoneRegex.test(value)) {
-        //     newErrors = "Invalid Australian phone number format";
-        // } else {
-        //     newErrors = null;
-        // }
-        // setErrors(newErrors)
-        updateFormData(name, value);
-    };
-
     return (
         <div className="w-full max-w-2xl mx-auto p-6 rounded-lg">
-            <h1 className="text-3xl font-bold text-center mb-4 text-white">Select Number Type</h1>
-            <p className="text-center text-ocean mb-6">Choose between new number or existing number</p>
-            <Input
-                className="mb-4"
-                isRequired
-                label={"SIM Number"}
-                name={"simNumber"}
-                value={formData.simNumber}
-                onChange={handleInputChange}
-                variant="bordered"
-                errorMessage={errors}
-                isInvalid={!!errors || formData["simNumber"] === ''}
-                // isDisabled={isSubmitted || isLoading}
-                type={"text"}
-                placeholder={"Enter your SIM number"}
-            />
+            <h1 className="text-3xl font-bold text-center mb-4 text-white">{title}</h1>
+            <p className="text-center mb-6">{description}</p>
             <div className="grid grid-cols-2 gap-4 mb-6">
                 <Button
+                    isDisabled={isFormSubmitted}
                     color={formData.numberType === "new" ? "primary" : "default"}
                     className={`px-6 py-3 rounded-full ${formData.numberType === "new"
                         ? "bg-ocean text-white"
@@ -53,6 +34,7 @@ export default function SelectNumberType({ updateFormData, formData, handleNextS
                     New Number
                 </Button>
                 <Button
+                    isDisabled={isFormSubmitted}
                     color={formData.numberType === "existing" ? "primary" : "default"}
                     className={`px-6 py-3 rounded-full ${formData.numberType === "existing"
                         ? "bg-ocean text-white"
