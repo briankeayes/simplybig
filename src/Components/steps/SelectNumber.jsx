@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
+import { Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import { API_URL } from "../../constants";
 import PropTypes from 'prop-types';
 
@@ -51,6 +51,8 @@ export default function SelectNumber({ title, description, updateFormData, formD
     const [otpError, setOtpError] = useState("");
     const [timer, setTimer] = useState(300); // 5 minutes in seconds
     const [transactionId, setTransactionId] = useState(null);
+
+    const providers = ["Telstra", "Optus", "Vodafone"];
 
     const fetchNumbers = async () => {
         setIsLoading(true);
@@ -179,6 +181,12 @@ export default function SelectNumber({ title, description, updateFormData, formD
     const handleExistingNumberChange = (e) => {
         updateFormData("phoneNumber", e.target.value);
     };
+    const handleARNChange = (e) => {
+        updateFormData("arn", e.target.value);
+    };
+    const handleProviderChange = (selectedKeys) => {
+        updateFormData("provider", Array.from(selectedKeys)[0]);
+    };
 
     const renderNumberButtons = () => {
         const buttons = availableNumbers.map((number, i) => (
@@ -205,7 +213,7 @@ export default function SelectNumber({ title, description, updateFormData, formD
 
         return <div className="grid grid-cols-2 gap-4 mb-6">{buttons}</div>;
     };
-
+console.log(!formData.selectedNumber && formData.numberType === 'new',"////",!formData.selectedNumber ,"///", formData.numberType)
     return (
         <div className="w-full max-w-2xl mx-auto">
             <h1 className="text-3xl font-bold text-center text-white mb-4">{title}</h1>
@@ -237,15 +245,52 @@ export default function SelectNumber({ title, description, updateFormData, formD
                 </>
             ) : (
                 <>
+                    <div className="flex gap-3">
+                        <Dropdown size={"md"} className="mb-6  bg-white">
+                            <DropdownTrigger className="min-h-14 bg-gray-100">
+                                <Button
+                                    isDisabled={isFormSubmitted}
+                                    variant="bordered"
+                                    className={`w-2/4 justify-start`}
+                                >
+                                    {formData.provider || "Select Provider"}
+                                    {!formData.provider && (<span className='text-red-500'>*</span>)}
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                                aria-label="Provider selection *"
+                                variant="flat"
+                                disallowEmptySelection
+                                selectionMode="single"
+                                selectedKeys={formData.provider ? [formData.provider] : []}
+                                onSelectionChange={handleProviderChange}
+                            >
+                                {providers.map((provider) => (
+                                    <DropdownItem key={provider}>{provider}</DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        </Dropdown>
+                        <Input
+                            label="Account Resource Number (ARN) "
+                            placeholder="Enter your existing number"
+                            value={formData.arn}
+                            onChange={handleARNChange}
+                            className="mb-6"
+                            isDisabled={isFormSubmitted}
+                        />
+
+                    </div>
                     <Input
                         label="Your Existing Number to get OTP"
                         placeholder="Enter your existing number"
                         value={formData.phoneNumber}
                         onChange={handleExistingNumberChange}
                         className="mb-6"
+                        isDisabled={isFormSubmitted}
+
                     />
                     <Button
-                        isDisabled={isFormSubmitted}
+                        isDisabled={isFormSubmitted || !formData.provider || !formData.arn}
                         color="primary"
                         onClick={handleGetOtp}
                         className="w-full mb-6"
@@ -255,7 +300,6 @@ export default function SelectNumber({ title, description, updateFormData, formD
                     </Button>
                 </>
             )}
-            {/* {NavigationButtons} */}
             <Modal
                 isOpen={showOtpModal}
                 onClose={() => setShowOtpModal(false)}
@@ -315,6 +359,8 @@ SelectNumber.propTypes = {
         custNo: PropTypes.string,
         phoneNumber: PropTypes.string,
         selectedNumber: PropTypes.string,
+        arn: PropTypes.string,
+        provider: PropTypes.string,
         numberType: PropTypes.oneOf(["new", "existing"])
     }).isRequired,
     isFormSubmitted: PropTypes.bool.isRequired

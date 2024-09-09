@@ -87,7 +87,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
         simNumber: !formData.simNumber,
         numberType: !formData.numberType,
         accountDetails: !isAccountDetailsValid || isLoading,
-        selectNumber: !formData.selectedNumber && formData.numberType === 'new',
+        selectNumber: formData.numberType === 'new' ? !formData.selectedNumber : (!formData.arn || !formData.provider),
         payment: !formData.paymentToken,
         consent: !formData.sign
     }), [formData, isAccountDetailsValid, isLoading]);
@@ -179,6 +179,8 @@ MainContent.propTypes = {
         firstName: PropTypes.string,
         surname: PropTypes.string,
         email: PropTypes.string,
+        arn: PropTypes.string,
+        provider: PropTypes.string,
         phoneNumber: PropTypes.string,
         sal: PropTypes.string,
         dob: PropTypes.string,

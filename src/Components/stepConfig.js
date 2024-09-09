@@ -1,41 +1,41 @@
 // stepConfig.js
 export const STEPS = [
-    {
-      key: 'welcome',
-      title: 'Welcome',
-      description: 'Get started with Simply Big',
-      component: 'Welcome', // This should match the import name in MainContent
-    },
-    {
-      key: 'simNumber',
-      title: 'Enter SIM Number',
-      description: 'Enter SIM number to begin actiavation.',
-      component: 'SimNumber',
-    },
+    // {
+    //   key: 'welcome',
+    //   title: 'Welcome',
+    //   description: 'Get started with Simply Big',
+    //   component: 'Welcome', // This should match the import name in MainContent
+    // },
+    // {
+    //   key: 'simNumber',
+    //   title: 'Enter SIM Number',
+    //   description: 'Enter SIM number to begin actiavation.',
+    //   component: 'SimNumber',
+    // },
     {
       key: 'numberType',
       title: 'Select Number Type',
       description: 'Choose between new number or existing number',
       component: 'SelectNumberType',
     },
-    {
-      key: 'accountDetails',
-      title: 'Account Details',
-      description: 'Enter your billing information',
-      component: 'AccountDetails',
-    },
-    {
-      key: 'selectPlan',
-      title: 'International Plan',
-      description: 'Upgrade your plan',
-      component: 'SelectPlan',
-    },
+    // {
+    //   key: 'accountDetails',
+    //   title: 'Account Details',
+    //   description: 'Enter your billing information',
+    //   component: 'AccountDetails',
+    // },
+    // {
+    //   key: 'selectPlan',
+    //   title: 'International Plan',
+    //   description: 'Upgrade your plan',
+    //   component: 'SelectPlan',
+    // },
     {
       key: 'selectNumber',
       title: 'Select Number',
       description: 'Choose your phone number',
       component: 'SelectNumber',
-      condition: (formData) => formData.numberType === 'new',
+      // condition: (formData) => formData.numberType === 'new',
     },
     {
       key: 'payment',

@@ -5,17 +5,6 @@ import { Input } from "@nextui-org/react";
 export default function SimNumber({ title, description, updateFormData, formData, isFormSubmitted }) {
     const [errors, setErrors] = useState("");
 
-    // const handleInputChange = (e) => {
-    //     const { name, value } = e.target;
-
-    //     // Validate input to allow only numbers
-    //     if (/^\d*$/.test(value)) {
-    //         setErrors("");
-    //         updateFormData(name, value);
-    //     } else {
-    //         setErrors("Please enter numbers only");
-    //     }
-    // };
     const handleInputChange = (e) => {
         const { name, value } = e.target;
     

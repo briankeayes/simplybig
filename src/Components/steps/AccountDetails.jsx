@@ -257,7 +257,7 @@ export default function AccountDetails({ title, description, updateFormData, for
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <Dropdown size={"md"}>
-                            <DropdownTrigger>
+                            <DropdownTrigger className="min-h-14">
                                 <Button
                                     isDisabled={isSubmitted || isLoading || isFormSubmitted}
                                     variant="bordered"

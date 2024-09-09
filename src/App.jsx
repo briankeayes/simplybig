@@ -16,8 +16,8 @@ export default function App() {
     simNumber: "",
 
     // Number selection
-    // numberType: "",
-    numberType: "new",
+    numberType: "",
+    // numberType: "new",
     newNumber: "",
     existingNumber: "",
     availableNumbers:[],
