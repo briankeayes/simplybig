@@ -24,7 +24,7 @@ const CheckIcon = ({
     );
 };
 
-export default function Payment({ title, description, updateFormData, formData, isFormSubmitted }) {
+export default function Payment({ updateFormData, formData, isFormSubmitted }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const creditCardFrameRef = useRef(null);
@@ -215,8 +215,8 @@ export default function Payment({ title, description, updateFormData, formData, 
 
     return (
         <div className="w-full max-w-4xl mx-auto relative">
-            <h1 className="text-3xl font-bold text-center mb-4 text-white">{title}</h1>
-            <p className="text-center mb-6">{description}</p>
+            {/* <h1 className="text-3xl font-bold text-center mb-4 text-white">{title}</h1>
+            <p className="text-center mb-6">{description}</p> */}
             <div className="flex flex-row content-center justify-center mb-4">
                 <Popover showArrow backdrop="blur">
                     <PopoverTrigger>
@@ -389,8 +389,6 @@ export default function Payment({ title, description, updateFormData, formData, 
 }
 
 Payment.propTypes = {
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
     updateFormData: PropTypes.func.isRequired,
     formData: PropTypes.shape({
         // numberType: PropTypes.oneOf(['new','existing'])

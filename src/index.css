@@ -18,6 +18,14 @@ body {
 div[data-quickstream-api="bankAccountContainer"] > iframe {
   height: 10rem;
 }
+::placeholder {
+  color: var(--color-midnight);
+  opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder { /* Edge 12 -18 */
+  color: var(--color-midnight);
+}
 /* document.querySelector('div[data-quickstream-api="bankAccountContainer"] > iframe').style.height='10rem' */
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

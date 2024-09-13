@@ -1,32 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import PropTypes from 'prop-types';
 import { Switch, cn } from "@nextui-org/react";
 import { Check } from 'lucide-react';
 
-const plans = [
-    {
-        id: "basic",
-        name: "Basic",
-        price: "$10/month",
-        features: ["1GB Data", "100 Minutes", "100 SMS"],
-        color: "from-blue-400 to-blue-600"
-    },
-    {
-        id: "standard",
-        name: "Standard",
-        price: "$20/month",
-        features: ["5GB Data", "Unlimited Minutes", "Unlimited SMS"],
-        color: "from-purple-400 to-purple-600"
-    },
-    {
-        id: "premium",
-        name: "Premium",
-        price: "$30/month",
-        features: ["Unlimited Data", "Unlimited Minutes", "Unlimited SMS", "International Roaming"],
-        color: "from-pink-400 to-pink-600"
-    },
-];
-
-export default function SelectPlan({ updateFormData, formData, NavigationButtons, isFormSubmitted }) {
+export default function SelectPlan({ updateFormData, formData, isFormSubmitted }) {
 
     const [isEnabled, setIsEnabled] = useState(formData.isUpgraded || false);
 
@@ -38,15 +15,7 @@ export default function SelectPlan({ updateFormData, formData, NavigationButtons
 
     return (
         <div className="w-full max-w-4xl mx-auto">
-            <h1 className="text-3xl text-center text-white mb-4">Special Offer: <br /><span className="font-bold">Add unlimited calls and SMS to 14 countries</span></h1>
-            <p className="text-center text-aqua text-xl my-8">
-                {/* <br />
-                This upgrade gives you Unlimited calls to China, France, Germany, Greece, Hong Kong, India, Ireland, Malaysia, Singapore, South Korea, Thailand, the United Kingdom, the USA, and Vietnam.
-                <br />
-                <br /> */}
-                {/* Upgrade today for only an extra $19/month (save $10/month).<br /><br /> */}
-                {/* Would you like to upgrade to the unlimited International plan? <br /> */}
-            </p>
+            <h1 className="text-3xl text-center text-aqua mb-4">Special Offer: <br /><span className="font-bold">Add unlimited calls and SMS to 14 countries</span></h1>
             <div className="space-y-4 text-center max-w-[37rem] align-middle content-center mx-auto">
                 <ul className="space-y-2 text-center">
                     {[
@@ -95,13 +64,20 @@ export default function SelectPlan({ updateFormData, formData, NavigationButtons
                     </div>
                 </Switch>
             </div>
-            {/* <div className="text-xs text-center text-white-200 max-w-prose mx-auto">
-                14 countries include: <span className="italic">China, France, Germany, Greece, Hong Kong, India, Ireland, Malaysia, Singapore, South Korea, Thailand, the United Kingdom, the USA, and Vietnam.</span>
-            </div> */}
-            {NavigationButtons}
         </div>
     );
 }
+
+SelectPlan.propTypes = {
+    // title: PropTypes.string.isRequired,
+    // description: PropTypes.string.isRequired,
+    updateFormData: PropTypes.func.isRequired,
+    formData: PropTypes.shape({
+        isUpgraded: PropTypes.bool
+    }).isRequired,
+    isFormSubmitted: PropTypes.bool.isRequired,
+};
+
 
 // function CheckIcon(props) {
 //     return (

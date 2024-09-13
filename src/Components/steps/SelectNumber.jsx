@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody, 
+    // Dropdown, DropdownTrigger, DropdownMenu, DropdownItem 
+} from "@nextui-org/react";
 import { API_URL } from "../../constants";
 import PropTypes from 'prop-types';
 
@@ -41,7 +43,7 @@ const OtpInput = ({ value, onChange, length = 5 }) => {
         </div>
     );
 };
-export default function SelectNumber({ title, description, updateFormData, formData, isFormSubmitted }) {
+export default function SelectNumber({updateFormData, formData, isFormSubmitted }) {
     const [availableNumbers, setAvailableNumbers] = useState(formData.availableNumbers || []);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -51,8 +53,10 @@ export default function SelectNumber({ title, description, updateFormData, formD
     const [otpError, setOtpError] = useState("");
     const [timer, setTimer] = useState(300); // 5 minutes in seconds
     const [transactionId, setTransactionId] = useState(null);
+    const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
+    const [phErrors, setPhErrors] = useState("");
 
-    const providers = ["Telstra", "Optus", "Vodafone"];
+    // const providers = ["Telstra", "Optus", "Vodafone"];
 
     const fetchNumbers = async () => {
         setIsLoading(true);
@@ -115,11 +119,12 @@ export default function SelectNumber({ title, description, updateFormData, formD
                 },
                 body: JSON.stringify({
                     custNo: formData.custNo,
-                    destination: formData.phoneNumber,
+                    destination: formData.portingNumber,
                 }),
             });
             if (!response.ok) throw new Error('Failed to get OTP');
             const data = await response.json();
+            // const data = {return:{getOtp:{transactionId:"ewewew"}}}
             setTransactionId(data.return.getOtp.transactionId);
             // console.log(data,transactionId)
             setShowOtpModal(true);
@@ -150,6 +155,7 @@ export default function SelectNumber({ title, description, updateFormData, formD
             });
             if (!response.ok) throw new Error('Failed to verify OTP');
             const data = await response.json();
+            // const data = {verified:true}
             if (data.verified) {
                 setShowOtpModal(false);
                 // Handle successful verification (e.g., update formData or move to next step)
@@ -179,13 +185,21 @@ export default function SelectNumber({ title, description, updateFormData, formD
     };
 
     const handleExistingNumberChange = (e) => {
-        updateFormData("phoneNumber", e.target.value);
+        if (!phoneRegex.test(e.target.value)) {
+            setPhErrors("Invalid Australian phone number format");
+        }else{
+            setPhErrors("");
+            updateFormData("portingNumber", e.target.value);
+        }
     };
     const handleARNChange = (e) => {
         updateFormData("arn", e.target.value);
     };
-    const handleProviderChange = (selectedKeys) => {
-        updateFormData("provider", Array.from(selectedKeys)[0]);
+    // const handleProviderChange = (selectedKeys) => {
+    //     updateFormData("provider", Array.from(selectedKeys)[0]);
+    // };
+    const handleProviderChange = (e) => {
+        updateFormData("provider", e.target.value);
     };
 
     const renderNumberButtons = () => {
@@ -213,11 +227,10 @@ export default function SelectNumber({ title, description, updateFormData, formD
 
         return <div className="grid grid-cols-2 gap-4 mb-6">{buttons}</div>;
     };
-console.log(!formData.selectedNumber && formData.numberType === 'new',"////",!formData.selectedNumber ,"///", formData.numberType)
     return (
         <div className="w-full max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold text-center text-white mb-4">{title}</h1>
-            <p className="text-center mb-6">{description}</p>
+            {/* <h1 className="text-3xl font-bold text-center text-white mb-4">{title}</h1>
+            <p className="text-center mb-6">{description}</p> */}
             {formData.numberType === "new" ? (
                 <>
                     {isLoading && availableNumbers.length === 0 ? (
@@ -245,8 +258,19 @@ console.log(!formData.selectedNumber && formData.numberType === 'new',"////",!fo
                 </>
             ) : (
                 <>
+                    <Input
+                        label="Existing mobile number to be ported to this SIM card"
+                        placeholder="Enter your existing number"
+                        // value={formData.portingNumber}
+                        isRequired={true}
+                        onChange={handleExistingNumberChange}
+                        className="mb-6"
+                        isInvalid={!!phErrors}
+                        errorMessage={phErrors}
+                        description="Important: This is not your contact number for billing, that is provided below. Only provide an existing mobile number if you want us to contact the provider for this mobile number and transfer it to us, so you can use it on this SIM card."
+                    />
                     <div className="flex gap-3">
-                        <Dropdown size={"md"} className="mb-6  bg-white">
+                        {/* <Dropdown size={"md"} className="mb-6  bg-white">
                             <DropdownTrigger className="min-h-14 bg-gray-100">
                                 <Button
                                     isDisabled={isFormSubmitted}
@@ -269,26 +293,25 @@ console.log(!formData.selectedNumber && formData.numberType === 'new',"////",!fo
                                     <DropdownItem key={provider}>{provider}</DropdownItem>
                                 ))}
                             </DropdownMenu>
-                        </Dropdown>
+                        </Dropdown> */}
                         <Input
-                            label="Account Resource Number (ARN) "
-                            placeholder="Enter your existing number"
+                            label="Current Provider"
+                            placeholder="Enter your current provider"
+                            value={formData.provider}
+                            onChange={handleProviderChange}
+                            className="mb-6"
+                            isDisabled={isFormSubmitted}
+                        />
+                        <Input
+                            label="Account Number"
+                            placeholder="Enter your account number"
                             value={formData.arn}
+                            description="Found on your invoice from your existing provider"
                             onChange={handleARNChange}
                             className="mb-6"
                             isDisabled={isFormSubmitted}
                         />
-
                     </div>
-                    <Input
-                        label="Your Existing Number to get OTP"
-                        placeholder="Enter your existing number"
-                        value={formData.phoneNumber}
-                        onChange={handleExistingNumberChange}
-                        className="mb-6"
-                        isDisabled={isFormSubmitted}
-
-                    />
                     <Button
                         isDisabled={isFormSubmitted || !formData.provider || !formData.arn}
                         color="primary"
@@ -350,8 +373,6 @@ console.log(!formData.selectedNumber && formData.numberType === 'new',"////",!fo
 }
 
 SelectNumber.propTypes = {
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
     updateFormData: PropTypes.func.isRequired,
     formData: PropTypes.shape({
         // numberType: PropTypes.oneOf(['new','existing'])
@@ -361,6 +382,7 @@ SelectNumber.propTypes = {
         selectedNumber: PropTypes.string,
         arn: PropTypes.string,
         provider: PropTypes.string,
+        portingNumber: PropTypes.string,
         numberType: PropTypes.oneOf(["new", "existing"])
     }).isRequired,
     isFormSubmitted: PropTypes.bool.isRequired

@@ -4,7 +4,7 @@ export default function Welcome() {
     return (
         <div className="w-full max-w-2xl mx-auto text-center justify-content-center">
             <img src="/logo.svg" className="max-w-[50%] mx-auto" alt="Logo" />
-            <div className="text-white text-xl my-8">
+            <div className="text-xl my-8">
                 <p className="mb-4">
                     Press Next to begin activation of your SIM card.
                 </p>

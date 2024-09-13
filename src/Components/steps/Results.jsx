@@ -18,8 +18,8 @@ export default function Results() {
 
   return (
     <div className="w-full max-w-2xl mx-auto text-center justify-content-center">
-      <h2 className="text-4xl mb-4">Congrats!</h2>
-      <p className="mb-4">Your request to activate your SIM card has been received.</p>
+      {/* <h2 className="text-4xl mb-4">Congrats!</h2>
+      <p className="mb-4">Your request to activate your SIM card has been received.</p> */}
       <p className="mb-4">We will email you once it has been activated, and you can then insert the SIM card. This usually happens within a few minutes but can take longer if we are transferring an existing number.</p>
       <Card className="bg-ocean text-white">
         <CardHeader className="text-2xl mb-4 text-center">

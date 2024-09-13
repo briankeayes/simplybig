@@ -5,8 +5,6 @@ import { Button } from "@nextui-org/react";
 import { Check, RotateCcw } from 'lucide-react';
 
 Consent.propTypes = {
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
     onSave: PropTypes.func,
     updateFormData: PropTypes.func,
     formData: PropTypes.shape({
@@ -15,7 +13,7 @@ Consent.propTypes = {
     isFormSubmitted: PropTypes.bool.isRequired,
 }
 
-export default function Consent({ title, description, updateFormData, formData, onSave, isFormSubmitted }) {
+export default function Consent({ updateFormData, formData, onSave, isFormSubmitted }) {
     const consents = [
         "have read and accept the critical information summary",
         "have read and accept the direct debit terms and conditions",
@@ -58,8 +56,8 @@ export default function Consent({ title, description, updateFormData, formData, 
 
     return (
         <div className="w-full max-w-2xl mx-auto text-center flex flex-col justify-center items-center">
-            <h1 className="text-3xl font-bold text-center mb-4 text-white">{title}</h1>
-            <p className="text-center mb-6">{description}</p>
+            {/* <h1 className="text-3xl font-bold text-center mb-4 text-white">{title}</h1>
+            <p className="text-center mb-6">{description}</p> */}
             <div className="mb-4 text-left">
                 <ul className="space-y-2 ">
                     {consents.map((consent, i) => (

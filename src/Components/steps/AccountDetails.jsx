@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Card, CardBody, Spinner } from "@nextui-org/react";
 
 AccountDetails.propTypes = {
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
+    // title: PropTypes.string.isRequired,
+    // description: PropTypes.string.isRequired,
     updateFormData: PropTypes.func.isRequired,
     formData: PropTypes.shape({
         firstName: PropTypes.string,
@@ -28,7 +28,7 @@ AccountDetails.propTypes = {
     isFormSubmitted: PropTypes.bool.isRequired,
 };
 
-export default function AccountDetails({ title, description, updateFormData, formData, onValidationChange, isLoading, isSubmitted, isFormSubmitted }) {
+export default function AccountDetails({ updateFormData, formData, onValidationChange, isLoading, isSubmitted, isFormSubmitted }) {
     const salutations = ["Mr", "Mrs", "Ms", "Mstr", "Miss", "Dr", "Mx", "Other"];
     const autocompleteInput = useRef(null);
     const [errors, setErrors] = useState({});
@@ -94,15 +94,15 @@ export default function AccountDetails({ title, description, updateFormData, for
         validateField(name, value);
     };
 
-    const handleContactMethod = (method) => {
-        updateFormData("preferredContactMethod", method);
-        validateField("preferredContactMethod", method);
-    }
+    // const handleContactMethod = (method) => {
+    //     updateFormData("preferredContactMethod", method);
+    //     validateField("preferredContactMethod", method);
+    // }
 
-    const handleCustType = (cust) => {
-        updateFormData("custType", cust);
-        validateField("custType", cust);
-    }
+    // const handleCustType = (cust) => {
+    //     updateFormData("custType", cust);
+    //     validateField("custType", cust);
+    // }
 
     const handleSelectionChange = (field) => (selectedKeys) => {
         const selectedValue = Array.from(selectedKeys)[0];
@@ -206,7 +206,7 @@ export default function AccountDetails({ title, description, updateFormData, for
         validateForm();
     }, [formData, errors, onValidationChange]);
 
-    const renderField = (name, label, placeholder, type = "text") => (
+    const renderField = (name, label, placeholder, type = "text", description = '') => (
         <Input
             label={label}
             name={name}
@@ -219,11 +219,15 @@ export default function AccountDetails({ title, description, updateFormData, for
             type={type}
             placeholder={placeholder}
             isRequired
+            // description={name == 'phoneNumber' ? 'Your best number for us to contact you about your account e.g. 0412345678' : ''}
+            description={description}
         />
     );
 
     return (
-        <Card className="w-full max-w-2xl mx-auto">
+        <div>
+
+            {/* <Card className="w-full max-w-2xl mx-auto"> */}
             {isLoading && (
                 <div className="fixed inset-0 bg-midnight bg-opacity-50 flex text-white items-center justify-center z-50">
                     <Spinner label="Adding customer..." className="text-white" color="white" />
@@ -240,71 +244,71 @@ export default function AccountDetails({ title, description, updateFormData, for
                     </Card>
                 </div>
             )}
-            <CardBody className="p-8 ">
-                <h1 className="text-3xl font-bold text-center mb-2 text-midnight">{title}</h1>
-                <p className="text-center mb-8">{description}</p>
-                <form className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        {renderField("firstName", "First Name", "Type your first name here")}
-                        {renderField("surname", "Last Name", "Type your last name here")}
-                    </div>
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        {renderField("email", "Email", "email@company.com", 'email')}
+            {/* <CardBody className="p-8 "> */}
+            {/* <h1 className="text-3xl font-bold text-center mb-2 text-midnight">{title}</h1>
+                <p className="text-center mb-8">{description}</p> */}
+            <form className="space-y-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    {renderField("firstName", "First Name", "Type your first name here")}
+                    {renderField("surname", "Last Name", "Type your last name here")}
+                </div>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    {renderField("email", "Email", "email@company.com", 'email', 'We will send your monthly invoice to this email address')}
 
-                        {renderField("phoneNumber", "Phone Number", "Enter your phone number", 'text')}
+                    {renderField("phoneNumber", "Phone Number", "Enter your phone number", 'text', 'Your best number for us to contact you about your account e.g. 0412345678')}
 
-                    </div>
+                </div>
 
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <Dropdown size={"md"}>
-                            <DropdownTrigger className="min-h-14">
-                                <Button
-                                    isDisabled={isSubmitted || isLoading || isFormSubmitted}
-                                    variant="bordered"
-                                    className={`w-full justify-start ${errors.sal ? 'border-red-500' : ''}`}
-                                >
-                                    {formData.sal || "Select Salutation"}
-                                    {!formData.sal && (<span className='text-red-500'>*</span>)}
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu
-                                aria-label="Salutation selection *"
-                                variant="flat"
-                                disallowEmptySelection
-                                selectionMode="single"
-                                selectedKeys={formData.sal ? [formData.sal] : []}
-                                onSelectionChange={handleSelectionChange("sal")}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <Dropdown size={"md"}>
+                        <DropdownTrigger className="min-h-14">
+                            <Button
+                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
+                                variant="bordered"
+                                className={`w-full justify-start ${errors.sal ? 'border-red-500' : ''}`}
                             >
-                                {salutations.map((salutation) => (
-                                    <DropdownItem key={salutation}>{salutation}</DropdownItem>
-                                ))}
-                            </DropdownMenu>
-                        </Dropdown>
-                        {errors.sal && <p className="text-red-500 text-sm">{errors.sal}</p>}
+                                {formData.sal || "Select Salutation"}
+                                {!formData.sal && (<span className='text-red-500'>*</span>)}
+                            </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                            aria-label="Salutation selection *"
+                            variant="flat"
+                            disallowEmptySelection
+                            selectionMode="single"
+                            selectedKeys={formData.sal ? [formData.sal] : []}
+                            onSelectionChange={handleSelectionChange("sal")}
+                        >
+                            {salutations.map((salutation) => (
+                                <DropdownItem key={salutation}>{salutation}</DropdownItem>
+                            ))}
+                        </DropdownMenu>
+                    </Dropdown>
+                    {errors.sal && <p className="text-red-500 text-sm">{errors.sal}</p>}
 
-                        {renderField("dob", "Date of Birth", "Select your date of birth", "date")}
+                    {renderField("dob", "Date of Birth", "Select your date of birth", "date")}
 
-                    </div>
-                    <Input
-                        isRequired
-                        ref={autocompleteInput}
-                        label="Address"
-                        name="address"
-                        placeholder="Start typing your address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        variant="bordered"
-                        errorMessage={errors.address}
-                        isDisabled={isSubmitted || isLoading || isFormSubmitted}
-                        isInvalid={!!errors.address}
-                    />
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                        {renderField("suburb", "Suburb", "Enter your Suburb")}
-                        {renderField("state", "State", "Enter your State")}
-                        {renderField("postcode", "Postcode", "Enter your Postcode")}
+                </div>
+                <Input
+                    isRequired
+                    ref={autocompleteInput}
+                    label="Address"
+                    name="address"
+                    placeholder="Start typing your address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    variant="bordered"
+                    errorMessage={errors.address}
+                    isDisabled={isSubmitted || isLoading || isFormSubmitted}
+                    isInvalid={!!errors.address}
+                />
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    {renderField("suburb", "Suburb", "Enter your Suburb")}
+                    {renderField("state", "State", "Enter your State")}
+                    {renderField("postcode", "Postcode", "Enter your Postcode")}
 
-                    </div>
-                    <div className="space-y-2">
+                </div>
+                {/* <div className="space-y-2">
                         <h2 className="text-sm font-medium text-gray-600">Preferred Contact Method<span className='text-red-500'>*</span></h2>
                         <div className="flex gap-4">
                             <Button
@@ -354,9 +358,11 @@ export default function AccountDetails({ title, description, updateFormData, for
                     </div>
                     {formData.custType === "B" && (
                         renderField("abn", "Australian Business Number (ABN)", "Enter your ABN")
-                    )}
-                </form>
-            </CardBody>
-        </Card>
+                    )} */}
+            </form>
+            {/* </CardBody> */}
+            {/* </Card> */}
+        </div>
+
     );
 }

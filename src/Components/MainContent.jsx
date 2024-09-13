@@ -1,8 +1,9 @@
-import { useState, useMemo} from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { API_URL } from "../constants";
-import { getVisibleSteps } from "./stepConfig";
+// import { getVisibleSteps } from "./stepConfig";
 import PropTypes from 'prop-types';
+import { CardBody, Card } from "@nextui-org/react";
 
 // Import all step components
 import Welcome from "./steps/Welcome";
@@ -29,13 +30,14 @@ const STEP_COMPONENTS = {
 };
 
 
-export default function MainContent({ currentStep, handleNextStep, handlePrevStep, formData, updateFormData, handleSubmit, isFormSubmitted }) {
+export default function MainContent({ steps, currentStep, handleNextStep, handlePrevStep, formData, updateFormData, handleSubmit, isFormSubmitted }) {
     const [isAccountDetailsValid, setIsAccountDetailsValid] = useState(false);
+    const [isSimNumberValid, setIsSimNumberValid] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [custNo, setCustNo] = useState(null);
 
-    const visibleSteps = useMemo(() => getVisibleSteps(formData), [formData]);
+    // const steps = useMemo(() => getVisibleSteps(formData), [formData]);
 
     const handleAccountDetailsSubmit = async () => {
         if (isSubmitted) return handleNextStep();
@@ -84,13 +86,13 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
     };
 
     const getNextButtonDisabledState = useMemo(() => ({
-        simNumber: !formData.simNumber,
+        simNumber: !isSimNumberValid,
         numberType: !formData.numberType,
         accountDetails: !isAccountDetailsValid || isLoading,
         selectNumber: formData.numberType === 'new' ? !formData.selectedNumber : (!formData.arn || !formData.provider),
         payment: !formData.paymentToken,
         consent: !formData.sign
-    }), [formData, isAccountDetailsValid, isLoading]);
+    }), [formData, isAccountDetailsValid, isLoading, isSimNumberValid]);
 
     const getNextButtonHandler = useMemo(() => ({
         accountDetails: handleAccountDetailsSubmit,
@@ -99,7 +101,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
         // payment: handleSubmit,
     }), [handleAccountDetailsSubmit, handleSubmit]);
 
-    const isLastStep = currentStep === visibleSteps.length - 2;
+    const isLastStep = currentStep === steps.length - 2;
 
     const pageVariants = {
         initial: { opacity: 0, x: "-100%" },
@@ -114,21 +116,43 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
     };
 
     const renderStep = () => {
-        const currentStepConfig = visibleSteps[currentStep];
+        const currentStepConfig = steps[currentStep];
         const StepComponent = STEP_COMPONENTS[currentStepConfig.component];
+
+        if (currentStepConfig.key == "selectNumber" && formData.numberType === "existing") {
+            currentStepConfig.title = 'Existing Number Details'
+            currentStepConfig.description = 'Enter your current provider and account number.'
+        }
+
         return (
-            <StepComponent
-                title={currentStepConfig.title}
-                description={currentStepConfig.description}
-                handleNextStep={handleNextStep}
-                handlePrevStep={handlePrevStep}
-                updateFormData={updateFormData}
-                formData={formData}
-                isLoading={isLoading}
-                isSubmitted={isSubmitted}
-                isFormSubmitted={isFormSubmitted}
-                onValidationChange={setIsAccountDetailsValid}
-            />
+            <Card className="w-full max-w-2xl mx-auto">
+                <CardBody>
+                    <div className="w-full max-w-2xl mx-auto p-6 rounded-lg">
+                        {(currentStepConfig.key !== 'selectPlan') && (
+                            <>
+                                <h1 className="text-3xl font-bold text-midnight text-center mb-4">{currentStepConfig.title}</h1>
+                                <p className="text-center mb-6 text-aqua">{currentStepConfig.description}</p>
+                            </>
+                        )}
+
+                        <StepComponent
+                            title={currentStepConfig.title}
+                            description={currentStepConfig.description}
+                            handleNextStep={handleNextStep}
+                            handlePrevStep={handlePrevStep}
+                            updateFormData={updateFormData}
+                            formData={formData}
+                            isLoading={isLoading}
+                            isSubmitted={isSubmitted}
+                            isFormSubmitted={isFormSubmitted}
+                            setIsSimNumberValid={setIsSimNumberValid}
+                            onValidationChange={setIsAccountDetailsValid}
+                        />
+
+                    </div>
+                </CardBody>
+            </Card>
+
         );
     };
 
@@ -143,7 +167,7 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
                         exit="out"
                         variants={pageVariants}
                         transition={pageTransition}
-                        className="flex-grow flex flex-col justify-center bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6"
+                        className="flex-grow flex flex-col justify-center bg-white bg-opacity-10 text-black backdrop-blur-sm rounded-lg p-6"
                     >
                         {renderStep()}
                     </motion.div>
@@ -151,10 +175,10 @@ export default function MainContent({ currentStep, handleNextStep, handlePrevSte
                 <NavigationButtons
                     currentStep={currentStep}
                     handlePrevStep={handlePrevStep}
-                    handleNextStep={getNextButtonHandler[visibleSteps[currentStep].key] || handleNextStep}
-                    isNextDisabled={getNextButtonDisabledState[visibleSteps[currentStep].key] || false}
+                    handleNextStep={getNextButtonHandler[steps[currentStep].key] || handleNextStep}
+                    isNextDisabled={getNextButtonDisabledState[steps[currentStep].key] || false}
                     nextButtonText={(!isFormSubmitted && isLastStep) ? "Submit" : (currentStep === 2 && isLoading ? "Submitting..." : "Next")}
-                    showNextButton={currentStep != visibleSteps.length - 1}
+                    showNextButton={currentStep != steps.length - 1}
                 />
             </div>
             {/* {showSuccessOverlay && (
@@ -170,6 +194,7 @@ MainContent.propTypes = {
     handlePrevStep: PropTypes.func.isRequired,
     updateFormData: PropTypes.func.isRequired,
     handleSubmit: PropTypes.func.isRequired,
+    steps: PropTypes.any.isRequired,
     formData: PropTypes.shape({
         simNumber: PropTypes.string,
         numberType: PropTypes.string,
@@ -188,9 +213,9 @@ MainContent.propTypes = {
         suburb: PropTypes.string,
         state: PropTypes.string,
         postcode: PropTypes.string,
-        preferredContactMethod: PropTypes.oneOf(['EMAIL', 'SMS','']),
-        custType: PropTypes.oneOf(['B', 'R','']),
-        abn: PropTypes.string,  
+        preferredContactMethod: PropTypes.oneOf(['EMAIL', 'SMS', '']),
+        custType: PropTypes.oneOf(['B', 'R', '']),
+        abn: PropTypes.string,
     }).isRequired,
     isFormSubmitted: PropTypes.bool.isRequired,
 }

@@ -32,10 +32,9 @@ export const STEPS = [
     },
     {
       key: 'selectNumber',
-      title: 'Select Number',
-      description: 'Choose your phone number',
+      title: (formData) => formData.numberType === 'existing' ? 'Confirm Existing Number' : 'Select Number',
+      description: (formData) => formData.numberType === 'existing' ? 'Confirm your existing phone number' : 'Choose your phone number',
       component: 'SelectNumber',
-      // condition: (formData) => formData.numberType === 'new',
     },
     {
       key: 'payment',
@@ -51,12 +50,20 @@ export const STEPS = [
     },
     {
       key: 'results',
-      title: 'Results',
-      description: 'Your registration is complete',
+      title: 'Congrats!',
+      description: 'Your request to activate your SIM card has been received.',
       component: 'Results',
     },
   ];
   
+  // export const getVisibleSteps = () => {
+  //   return STEPS
+  //   //.filter(step => !step.condition || step.condition(formData));
+  // };
   export const getVisibleSteps = (formData) => {
-    return STEPS.filter(step => !step.condition || step.condition(formData));
+    return STEPS.map(step => ({
+      ...step,
+      title: typeof step.title === 'function' ? step.title(formData) : step.title,
+      description: typeof step.description === 'function' ? step.description(formData) : step.description,
+    }));
   };

@@ -1,9 +1,9 @@
 //App.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./Components/Sidebar";
 import MainContent from "./Components/MainContent";
 import { API_URL } from "./constants";
-// import { getVisibleSteps } from "./Components/stepConfig";
+import { getVisibleSteps } from "./Components/stepConfig";
 
 export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -20,15 +20,15 @@ export default function App() {
     // numberType: "new",
     newNumber: "",
     existingNumber: "",
-    availableNumbers:[],
+    availableNumbers: [],
     // Account details
     firstName: "",
     surname: "",
     email: "",
     sal: "",
-    preferredContactMethod: "",
+    preferredContactMethod: "EMAIL",
     dob: "",
-    custType: "",
+    custType: "R",
     suburb: "",
     state: "",
     postcode: "",
@@ -37,12 +37,15 @@ export default function App() {
     selectedPlan: null,
     isUpgraded: false,
 
+    provider: "",
+
     paymentToken: '',
 
     // Number selection (if new number)
     // selectedState: null,
     selectedNumber: null,
   });
+  const [steps, setSteps] = useState(() => getVisibleSteps(formData));
 
   const handleNextStep = () => {
     setCompletedSteps(prev => ({ ...prev, [currentStep]: true }));
@@ -56,6 +59,10 @@ export default function App() {
   const updateFormData = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
+
+  useEffect(() => {
+    setSteps(getVisibleSteps(formData));
+  }, [formData.numberType]);
 
   const handleFinalSubmit = async () => {
 
@@ -90,6 +97,7 @@ export default function App() {
     <div className="flex flex-col min-h-screen bg-ocean text-white">
       <div className="flex flex-1">
         <Sidebar
+          steps={steps}
           formData={formData}
           currentStep={currentStep}
           handlePrevStep={handlePrevStep}
@@ -99,6 +107,7 @@ export default function App() {
           setIsSidebarOpen={setIsSidebarOpen}
         />
         <MainContent
+          steps={steps}
           currentStep={currentStep}
           handleNextStep={handleNextStep}
           handlePrevStep={handlePrevStep}

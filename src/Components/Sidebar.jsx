@@ -1,10 +1,22 @@
-import { Card } from "@nextui-org/react";
-import { MessageCircleIcon } from "./Icons";
-import { getVisibleSteps } from "./stepConfig";
+// import { Card } from "@nextui-org/react";
+// import { MessageCircleIcon } from "./Icons";
+// import { useEffect } from "react";
+// import { getVisibleSteps } from "./stepConfig";
+// import { steps } from "framer-motion";
 import PropTypes from 'prop-types';
 
-export default function Sidebar({ formData, currentStep, setCurrentStep, completedSteps, isSidebarOpen, setIsSidebarOpen }) {
-    const steps = getVisibleSteps(formData);
+export default function Sidebar({ steps, currentStep, setCurrentStep, completedSteps, isSidebarOpen, setIsSidebarOpen }) {
+    // const steps = getVisibleSteps(formData);
+    // useEffect(() => {
+
+    //     steps.map((a) => {
+    //         if (a.key == 'selectNumber') {
+    //             return { ...a, title: 'Existing Number Details', description: 'Enter your current provider and account number.' }
+    //         } else {
+    //             return a;
+    //         }
+    //     })
+    // }, [formData, steps])
 
     const handleStepClick = (index) => {
         if (completedSteps[index] || index <= currentStep) {
@@ -29,7 +41,7 @@ export default function Sidebar({ formData, currentStep, setCurrentStep, complet
             >
                 Close
             </button>
-            <img src="/logo.svg" alt="Logo" className="max-w-[50%] mb-10"/>
+            <img src="/logo.svg" alt="Logo" className="max-w-[50%] mb-10" />
             <ol className="space-y-6">
                 {steps.map((step, index) => (
                     <li
@@ -38,13 +50,12 @@ export default function Sidebar({ formData, currentStep, setCurrentStep, complet
                         onClick={() => handleStepClick(index)}
                     >
                         <span
-                            className={`flex items-center justify-center w-8 h-8 rounded-full mr-4 transition-all duration-300 text-center ${
-                                isStepCompleted(index)
+                            className={`flex items-center justify-center w-8 h-8 rounded-full mr-4 transition-all duration-300 text-center ${isStepCompleted(index)
                                     ? "bg-aqua text-white"
                                     : currentStep === index
-                                    ? "bg-white text-midnight"
-                                    : "bg-indigo text-white"
-                            }`}
+                                        ? "bg-white text-midnight"
+                                        : "bg-indigo text-white"
+                                }`}
                         >
                             <span className="inline-block w-4 text-center">
                                 {isStepCompleted(index) ? "✓" : index + 1}
@@ -59,12 +70,12 @@ export default function Sidebar({ formData, currentStep, setCurrentStep, complet
                     </li>
                 ))}
             </ol>
-            <Card className="mt-10 p-4 bg-ocean bg-opacity-30">
+            {/* <Card className="mt-10 p-4 bg-ocean bg-opacity-30">
                 <div className="flex items-center">
                     <p className="ml-4 text-sm text-white">We are here to answer your questions.</p>
                     <MessageCircleIcon className="ml-auto w-5 h-5 text-indigo" />
                 </div>
-            </Card>
+            </Card> */}
         </aside>
     );
 }
@@ -73,8 +84,9 @@ Sidebar.propTypes = {
     completedSteps: PropTypes.object.isRequired,
     setIsSidebarOpen: PropTypes.func,
     setCurrentStep: PropTypes.func,
-    formData: PropTypes.shape({
-        sign: PropTypes.string
-    }).isRequired,
+    // formData: PropTypes.shape({
+    //     sign: PropTypes.string
+    // }).isRequired,
+    steps: PropTypes.array.isRequired,
     isSidebarOpen: PropTypes.bool.isRequired,
 }
