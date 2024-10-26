@@ -42,34 +42,34 @@ export default function Sidebar({ steps, currentStep, setCurrentStep, completedS
                 Close
             </button>
             <img src="/logo.svg" alt="Logo" className="max-w-[50%] mb-10" />
-            <ol className="space-y-6">
-                {steps.map((step, index) => (
-                    <li
-                        key={step.key}
-                        className={`flex items-start cursor-pointer ${currentStep === index ? "text-white" : "text-cloud-nine"}`}
-                        onClick={() => handleStepClick(index)}
-                    >
-                        <span
-                            className={`flex items-center justify-center w-8 h-8 rounded-full mr-4 transition-all duration-300 text-center ${isStepCompleted(index)
+            <table className="w-full border-separate border-spacing-y-4">
+                <tbody>
+                    {steps.map((step, index) => (
+                        <tr
+                            key={step.key}
+                            className={`cursor-pointer ${currentStep === index ? "text-white" : "text-cloud-nine"} transition-all duration-300`}
+                            onClick={() => handleStepClick(index)}
+                        >
+                            <td className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 text-center ${isStepCompleted(index)
                                     ? "bg-aqua text-white"
                                     : currentStep === index
                                         ? "bg-white text-midnight"
                                         : "bg-indigo text-white"
-                                }`}
-                        >
-                            <span className="inline-block w-4 text-center">
-                                {isStepCompleted(index) ? "✓" : index + 1}
-                            </span>
-                        </span>
-                        <div>
-                            <h3 className="font-bold">{step.title}</h3>
-                            <p className="text-sm text-cloud-nine">
-                                {step.description}
-                            </p>
-                        </div>
-                    </li>
-                ))}
-            </ol>
+                                } py-2`}>
+                                <span className="inline-block w-4 text-center">
+                                    {isStepCompleted(index) ? "✓" : index + 1}
+                                </span>
+                            </td>
+                            <td className="px-4">
+                                <h3 className="font-bold">{step.title}</h3>
+                                <p className="text-sm text-cloud-nine">
+                                    {step.description}
+                                </p>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
             {/* <Card className="mt-10 p-4 bg-ocean bg-opacity-30">
                 <div className="flex items-center">
                     <p className="ml-4 text-sm text-white">We are here to answer your questions.</p>

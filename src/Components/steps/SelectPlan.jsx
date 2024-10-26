@@ -25,7 +25,7 @@ export default function SelectPlan({ updateFormData, formData, isFormSubmitted }
                         // "Flexible plan - modify anytime",
                     ].map((benefit, index) => (
                         <li key={index} className="flex justify-center items-center space-x-2 text-white-600 dark:text-white-400">
-                            <Check className="h-5 w-5 bg-ocean p-1 rounded-full text-white font-bold" />
+                            {/* <Check className="h-5 w-5 bg-ocean p-1 rounded-full text-white font-bold" /> */}
                             <span>{benefit}</span>
                         </li>
                     ))}

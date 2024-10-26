@@ -77,7 +77,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
     useEffect(() => {
         // Load Google Maps JavaScript API script
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAUKRbwl61ZS5CfzHB5L_KQeOdLAG2gFV8&libraries=places`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBXHTUncWjY6ht1WEWVhTIV4KIfferln3g&libraries=places`;
         script.async = true;
         script.onload = initAutocomplete;
         document.body.appendChild(script);

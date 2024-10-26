@@ -217,8 +217,8 @@ export default function Payment({ updateFormData, formData, isFormSubmitted }) {
         <div className="w-full max-w-4xl mx-auto relative">
             {/* <h1 className="text-3xl font-bold text-center mb-4 text-white">{title}</h1>
             <p className="text-center mb-6">{description}</p> */}
-            <div className="flex flex-row content-center justify-center mb-4">
-                <Popover showArrow backdrop="blur">
+            {/*<div className="flex flex-row content-center justify-center mb-4">
+                 <Popover showArrow backdrop="blur">
                     <PopoverTrigger>
                         <Button size="sm" color="success"><LockIcon /> PROTECTED IN VAULT</Button>
                     </PopoverTrigger>
@@ -228,9 +228,9 @@ export default function Payment({ updateFormData, formData, isFormSubmitted }) {
                             <div className="text-tiny max-w-32">Data collected via fields that have our security seal are encrypted and stored with the highest global security standard — PCI compliance. Your data is absolutely safe in Vault.</div>
                         </div>
                     </PopoverContent>
-                </Popover>
+                </Popover> 
 
-            </div>
+            </div> */}
 
             {(paymentSuccess || formData.paymentToken) && (
                 <div className="fixed inset-0 bg-midnight bg-opacity-50 flex items-center justify-center z-50">
@@ -297,11 +297,13 @@ export default function Payment({ updateFormData, formData, isFormSubmitted }) {
                     <div className={`${paymentMethod === 'bank' ? '' : 'hidden'} border p-4 rounded`} data-quickstream-api="bankAccountContainer"></div>
                 </div>
                 <div className="flex justify-center mt-6">
-                    <Button className="bg-aqua" variant="bordered" type="submit" isDisabled={isSubmitting || isFormSubmitted}>Pay</Button>
+                    <Button className="bg-aqua text-cloud-nine" variant="bordered" type="submit" isDisabled={isSubmitting || isFormSubmitted}>Pay</Button>
                 </div>
             </form>
 
-
+            <div className="flex items-center justify-center text-xs text-center mt-4 text-ocean">
+                Guaranteed safe & secure payments managed by <Link isExternal href="https://www.symbio.global/security" className="ml-1 text-xs underline">Symbio</Link>
+            </div>
             {showLoadingOverlay && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="text-white text-center">

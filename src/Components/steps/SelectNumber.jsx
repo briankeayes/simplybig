@@ -79,10 +79,14 @@ export default function SelectNumber({updateFormData, formData, isFormSubmitted 
                 // throw new Error('No numbers available right now.')
             }
 
-            setAvailableNumbers(prevNumbers => {
-                const newNumbers = [...data.numbers, ...prevNumbers];
-                updateFormData("availableNumbers", newNumbers);
-                return newNumbers;
+            // setAvailableNumbers(prevNumbers => {
+            //     const newNumbers = [...data.numbers, ...prevNumbers];
+            //     updateFormData("availableNumbers", newNumbers);
+            //     return newNumbers;
+            // });
+            setAvailableNumbers(() => {
+                updateFormData("availableNumbers", data.numbers);
+                return data.numbers;
             });
         } catch (err) {
             setError(err.message);

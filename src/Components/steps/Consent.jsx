@@ -59,14 +59,20 @@ export default function Consent({ updateFormData, formData, onSave, isFormSubmit
             {/* <h1 className="text-3xl font-bold text-center mb-4 text-white">{title}</h1>
             <p className="text-center mb-6">{description}</p> */}
             <div className="mb-4 text-left">
-                <ul className="space-y-2 ">
-                    {consents.map((consent, i) => (
-                        <li key={i} className="flex justify-center items-center max-w-lg space-x-2 text-white-600 dark:text-white-400">
-                            <Check className="h-5 w-5 bg-ocean p-1 rounded-full text-white font-bold" />
-                            <span>{consent}</span>
-                        </li>
-                    ))}
-                </ul>
+                <table className="w-full">
+                    <tbody>
+                        {consents.map((consent, i) => (
+                            <tr key={i} className="flex justify-center items-center max-w-lg space-x-2 text-white-600 dark:text-white-400">
+                                <td style={{ width: '40px' }} className="flex justify-center items-center">
+                                    <Check className="h-5 w-5 bg-ocean p-1 rounded-full text-white font-bold" />
+                                </td>
+                                <td style={{ width: 'calc(100% - 40px)' }}>
+                                    <span>{consent}</span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
             {isSigned && (
                 <p>Saved Signature:</p>

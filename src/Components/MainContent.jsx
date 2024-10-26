@@ -124,7 +124,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
             currentStepConfig.description = 'Enter your current provider and account number.'
         }
 
-        return (
+        return (currentStepConfig.key !== 'welcome') ? (
             <Card className="w-full max-w-2xl mx-auto">
                 <CardBody>
                     <div className="w-full max-w-2xl mx-auto p-6 rounded-lg">
@@ -153,7 +153,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 </CardBody>
             </Card>
 
-        );
+        ):(<Welcome />);
     };
 
     return (
