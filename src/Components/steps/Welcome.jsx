@@ -5,10 +5,11 @@ export default function Welcome() {
         <div className="w-full max-w-2xl mx-auto text-center justify-content-center">
             <div className="flex flex-row items-center justify-center">
 
-                <h1 className="text-[4rem] text-cloud-nine text-center mb-4">
-                    Welcome to
+                <h1 className="text-[4rem] text-cloud-nine font-thin text-center mb-4">
+                    Welcome to Simply 
+                    <span className="font-bold "> BIG</span>
                 </h1>
-                <img src="/logo.svg" className="max-w-[50%] ml-4" alt="Logo" />
+                {/* <img src="/logo.svg" className="max-w-[50%] ml-4" alt="Logo" /> */}
             </div>
 
             <div className="text-xl my-8 text-cloud-nine">
