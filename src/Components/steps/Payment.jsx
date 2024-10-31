@@ -297,7 +297,7 @@ export default function Payment({ updateFormData, formData, isFormSubmitted }) {
                     <div className={`${paymentMethod === 'bank' ? '' : 'hidden'} border p-4 rounded`} data-quickstream-api="bankAccountContainer"></div>
                 </div>
                 <div className="flex justify-center mt-6">
-                    <Button className="bg-aqua text-cloud-nine" variant="bordered" type="submit" isDisabled={isSubmitting || isFormSubmitted}>Pay</Button>
+                    <Button className="bg-aqua text-cloud-nine" variant="bordered" type="submit" isDisabled={isSubmitting || isFormSubmitted}>Submit</Button>
                 </div>
             </form>
 
