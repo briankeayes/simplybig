@@ -9,7 +9,7 @@ export const STEPS = [
     {
       key: 'simNumber',
       title: 'Enter SIM Number',
-      description: 'Enter SIM number to begin actiavation.',
+      description: 'Enter the 13 digit number found on the new SIM card we sent you e.g. 4000031612571',
       component: 'SimNumber',
     },
     {

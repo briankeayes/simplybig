@@ -1,7 +1,6 @@
 import { useState } from "react";
 import PropTypes from 'prop-types';
 import { Switch, cn } from "@nextui-org/react";
-import { Check } from 'lucide-react';
 
 export default function SelectPlan({ updateFormData, formData, isFormSubmitted }) {
 

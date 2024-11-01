@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { API_URL } from "../constants";
 // import { getVisibleSteps } from "./stepConfig";
 import PropTypes from 'prop-types';
-import { CardBody, Card } from "@nextui-org/react";
+import { CardBody, Card, Link } from "@nextui-org/react";
 
 // Import all step components
 import Welcome from "./steps/Welcome";
@@ -132,6 +132,9 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                             <>
                                 <h1 className="text-3xl font-bold text-midnight text-center mb-4">{currentStepConfig.title}</h1>
                                 <p className="text-center mb-6 text-aqua">{currentStepConfig.description}</p>
+                                {(currentStepConfig.key == 'accountDetails' ) && (
+                                    <p className="text-center mt-0 mb-6 text-[0.7rem]"> If you wish to add an additional authorised representative to act on your behalf, please contact us at <Link className="text-[0.7rem]" href="mailto:contact@simplybig.com.au">contact@simplybig.com.au</Link>. We will provide you with our Authorised Representatives form to complete.</p>
+                                )}
                             </>
                         )}
 
