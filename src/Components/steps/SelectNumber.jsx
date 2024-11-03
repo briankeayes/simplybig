@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody, 
+import {
+    Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody,
     // Dropdown, DropdownTrigger, DropdownMenu, DropdownItem 
 } from "@nextui-org/react";
 import { API_URL } from "../../constants";
@@ -43,7 +44,7 @@ const OtpInput = ({ value, onChange, length = 5 }) => {
         </div>
     );
 };
-export default function SelectNumber({updateFormData, formData, isFormSubmitted }) {
+export default function SelectNumber({ updateFormData, formData, isFormSubmitted }) {
     const [availableNumbers, setAvailableNumbers] = useState(formData.availableNumbers || []);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -191,13 +192,16 @@ export default function SelectNumber({updateFormData, formData, isFormSubmitted 
     const handleExistingNumberChange = (e) => {
         if (!phoneRegex.test(e.target.value)) {
             setPhErrors("Invalid Australian phone number format");
-        }else{
+        } else {
             setPhErrors("");
             updateFormData("portingNumber", e.target.value);
         }
     };
     const handleARNChange = (e) => {
         updateFormData("arn", e.target.value);
+    };
+    const handleDobChange = (e) => {
+        updateFormData("dob_port", e.target.value);
     };
     // const handleProviderChange = (selectedKeys) => {
     //     updateFormData("provider", Array.from(selectedKeys)[0]);
@@ -315,6 +319,15 @@ export default function SelectNumber({updateFormData, formData, isFormSubmitted 
                             className="mb-6"
                             isDisabled={isFormSubmitted}
                         />
+                        <Input
+                            label="Date of Birth"
+                            value={formData.dob}
+                            onChange={handleDobChange}
+                            isDisabled={ isLoading || isFormSubmitted}
+                            type="date"
+                            isRequired
+                            description="Enter Date of birth registered with existing provider"
+                        />
                     </div>
                     <Button
                         isDisabled={isFormSubmitted || !formData.provider || !formData.arn}
@@ -386,6 +399,7 @@ SelectNumber.propTypes = {
         selectedNumber: PropTypes.string,
         arn: PropTypes.string,
         provider: PropTypes.string,
+        dob: PropTypes.any,
         portingNumber: PropTypes.string,
         numberType: PropTypes.oneOf(["new", "existing"])
     }).isRequired,
