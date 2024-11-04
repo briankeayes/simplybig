@@ -19,7 +19,7 @@ export default function SelectPlan({ updateFormData, formData, isFormSubmitted }
                 <ul className="space-y-2 text-center">
                     {[
                         "Upgrade today for $19/month (save 34%, usually $29/month)",
-                        "Includes China, France, Germany, Greece, Hong Kong, India, Ireland, Malaysia, Singapore, South Korea, Thailand, the United Kingdom, the USA, and Vietnam.",
+                        "Includes China, Hong Kong, Malaysia, Singapore, UK, Germany, India, NZ, South Korea, Vietnam, Greece, Ireland, Indonesia, Thailand and USA.",
                         // "24/7 priority customer support",
                         // "Flexible plan - modify anytime",
                     ].map((benefit, index) => (
