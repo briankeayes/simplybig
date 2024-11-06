@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import {
     Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody,
+    Link,
+    useDisclosure,
     // Dropdown, DropdownTrigger, DropdownMenu, DropdownItem 
 } from "@nextui-org/react";
 import { API_URL } from "../../constants";
 import PropTypes from 'prop-types';
+import { ClassNames } from "@emotion/react";
 
 const OtpInput = ({ value, onChange, length = 5 }) => {
     const inputs = useRef([]);
@@ -56,7 +59,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
     const [transactionId, setTransactionId] = useState(null);
     const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
     const [phErrors, setPhErrors] = useState("");
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
     // const providers = ["Telstra", "Optus", "Vodafone"];
 
     const fetchNumbers = async () => {
@@ -323,7 +326,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
                             label="Date of Birth"
                             value={formData.dob}
                             onChange={handleDobChange}
-                            isDisabled={ isLoading || isFormSubmitted}
+                            isDisabled={isLoading || isFormSubmitted}
                             type="date"
                             isRequired
                             description="Enter Date of birth registered with existing provider"
@@ -333,11 +336,31 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
                         isDisabled={isFormSubmitted || !formData.provider || !formData.arn}
                         color="primary"
                         onClick={handleGetOtp}
-                        className="w-full mb-6"
+                        className="w-full"
                         isLoading={isLoading}
                     >
                         Get OTP
                     </Button>
+                    <Link onPress={() => setIsModalOpen(true)} className="text-sm underline w-full justify-center mt-2 cursor-pointer">Cant recieve OTP?</Link>
+                    <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} >
+                        <ModalContent>
+                            <>
+                                <ModalHeader className="flex flex-col gap-1">Cant Receive OTP</ModalHeader>
+                                <ModalBody className="p-5">
+                                    <p>
+                                        If you are not able to receive the OTP we will need you to provide identity documents
+                                        to verify your identity before we can port your number,
+                                        please complete this
+                                        <Link href="https://www.emailmeform.com/builder/form/k79Dq4ccdL23">form</Link>.
+
+                                        
+                                    </p>
+                                </ModalBody>
+                            </>
+                            {/* )} */}
+                        </ModalContent>
+                    </Modal>
+
                 </>
             )}
             <Modal
