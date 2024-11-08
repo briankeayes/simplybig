@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import SignatureCanvas from 'react-signature-canvas';
 import { useRef, useState } from 'react';
-import { Button } from "@nextui-org/react";
+import { Button, Link } from "@nextui-org/react";
 import { Check, RotateCcw } from 'lucide-react';
 
 Consent.propTypes = {
@@ -13,14 +13,23 @@ Consent.propTypes = {
     isFormSubmitted: PropTypes.bool.isRequired,
 }
 
+ConsentRow.propTypes = {
+    key: PropTypes.number.isRequired, // Validate children prop
+    children: PropTypes.node.isRequired, // Validate children prop
+};
+function ConsentRow ({ key, children })  {
+    return (<tr key={key} className="flex justify-center items-center max-w-lg space-x-2 text-white-600 dark:text-white-400">
+        <td style={{ width: '40px' }} className="flex justify-center items-center">
+            <Check className="h-5 w-5 bg-ocean p-1 rounded-full text-white font-bold" />
+        </td>
+        <td style={{ width: 'calc(100% - 40px)' }}>
+            <span>
+                {children}
+            </span>
+        </td>
+    </tr>);
+}
 export default function Consent({ updateFormData, formData, onSave, isFormSubmitted }) {
-    const consents = [
-        "have read and accept the critical information summary",
-        "have read and accept the direct debit terms and conditions",
-        "authorise your bank account/credit card to be direct debited",
-        "if porting an existing number, you consent as the Rights of Use Holder of the Telecommunications Service to be transferred. *"
-    ];
-
     const sigCanvas = useRef();
     const [imageURL, setImageURL] = useState(formData.sign || null);
     const [isSigned, setIsSigned] = useState(!!formData.sign || null);
@@ -61,16 +70,18 @@ export default function Consent({ updateFormData, formData, onSave, isFormSubmit
             <div className="mb-4 text-left">
                 <table className="w-full">
                     <tbody>
-                        {consents.map((consent, i) => (
-                            <tr key={i} className="flex justify-center items-center max-w-lg space-x-2 text-white-600 dark:text-white-400">
-                                <td style={{ width: '40px' }} className="flex justify-center items-center">
-                                    <Check className="h-5 w-5 bg-ocean p-1 rounded-full text-white font-bold" />
-                                </td>
-                                <td style={{ width: 'calc(100% - 40px)' }}>
-                                    <span>{consent}</span>
-                                </td>
-                            </tr>
-                        ))}
+                        <ConsentRow key={1}>
+                            have read and accept the <Link isExternal href="https://simplybig.com.au/pages/critical-information-summary" className='underline'> critical information summary</Link>
+                        </ConsentRow>
+                        <ConsentRow key={2}>
+                            have read and accept the <Link href='https://simplybig.com.au/pages/direct-debit-terms-conditions' className='underline'> direct debit terms and conditions</Link>
+                        </ConsentRow>
+                        <ConsentRow key={3}>
+                            authorise your bank account/credit card to be direct debited
+                        </ConsentRow>
+                        <ConsentRow key={4}>
+                            if porting an existing number, you consent as the Rights of Use Holder of the Telecommunications Service to be transferred. *
+                        </ConsentRow>
                     </tbody>
                 </table>
             </div>
