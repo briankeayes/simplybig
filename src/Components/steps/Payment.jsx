@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Modal, ModalContent, Link, ModalHeader, ModalBody, ModalFooter, Button, Card, CardBody, Spinner, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
-import { LockIcon } from "lucide-react";
+import { Modal, ModalContent, Link, ModalHeader, ModalBody, ModalFooter, Button, Card, CardBody, Spinner } from "@nextui-org/react";
 import { API_URL } from "../../constants";
 import PropTypes from 'prop-types';
 
@@ -37,15 +36,16 @@ export default function Payment({ updateFormData, formData, isFormSubmitted }) {
 
     const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
 
-    const mode = "test";
+    // const mode = "test";
+    const mode = "prod";
     const publishableApiKey = mode === "test"
         ? "QUICKSTREAMDEMO_PUB"
-        : "TIAB_PUB_jqiyv6fcvvskukbm96reinkd2g97d8g8pip6tf7mazu8u6kyxds2gme5z5aa";
+        : "TIAB_PUB_asbcedfhxkgpq8qmj777umvifx7ysh6hrgx2muffcuh9tq3g6ku8dwpp5h3q";
     const scriptUrl = mode === "test"
         ? "https://api.quickstream.support.qvalent.com/rest/v1/quickstream-api-1.0.min.js"
         : "https://api.quickstream.westpac.com.au/rest/v1/quickstream-api-1.0.min.js";
 
-    const supplierBusinessCode = "QUICKSTREAMDEMO";
+    const supplierBusinessCode = "TIABREST";
 
 
 
