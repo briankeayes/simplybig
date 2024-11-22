@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { API_URL } from "../constants";
 // import { getVisibleSteps } from "./stepConfig";
@@ -39,7 +39,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
 
     // const steps = useMemo(() => getVisibleSteps(formData), [formData]);
 
-    const handleAccountDetailsSubmit = async () => {
+    const handleAccountDetailsSubmit = useCallback(async () => {
         if (isSubmitted) return handleNextStep();
         if (!isAccountDetailsValid) return;
 
@@ -78,13 +78,36 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
             setIsSubmitted(true);
             updateFormData('custNo', data.return.custNo);
             console.log(custNo)
+            handleNextStep();
         } catch (error) {
             console.error('Error adding customer:', error);
             // Handle error (you might want to show an error message to the user)
         } finally {
             setIsLoading(false);
         }
-    };
+    },[formData, handleNextStep, updateFormData]);
+
+    const handleSelectNumber = useCallback(() => {
+        // console.log(formData.selectedNumber)
+        // const response = 
+        fetch(`${API_URL}/selectNumber`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                number: formData.selectedNumber,
+            }),
+        })
+        .then((data) => data.json())
+        .then((data) => { 
+            console.log(data)
+        }).catch((err) => {
+            console.error(err)
+        })
+        return handleNextStep();
+
+    }, [formData.selectedNumber, handleNextStep]);
 
     const getNextButtonDisabledState = useMemo(() => ({
         simNumber: !isSimNumberValid,
@@ -98,9 +121,10 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
     const getNextButtonHandler = useMemo(() => ({
         accountDetails: handleAccountDetailsSubmit,
         // results: handleSubmit,
+        selectNumber: handleSelectNumber,
         consent: handleSubmit,
         // payment: handleSubmit,
-    }), [handleAccountDetailsSubmit, handleSubmit]);
+    }), [handleAccountDetailsSubmit, handleSubmit, handleSelectNumber]);
 
     const isLastStep = currentStep === steps.length - 2;
 
@@ -133,7 +157,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                             <>
                                 <h1 className="text-3xl font-bold text-midnight text-center mb-4">{currentStepConfig.title}</h1>
                                 <p className="text-center mb-6 text-aqua">{currentStepConfig.description}</p>
-                                {(currentStepConfig.key == 'accountDetails' ) && (
+                                {(currentStepConfig.key == 'accountDetails') && (
                                     <p className="text-center mt-0 mb-6 text-[0.7rem]"> If you wish to add an additional authorised representative to act on your behalf, please contact us at <Link className="text-[0.7rem]" href="mailto:contact@simplybig.com.au">contact@simplybig.com.au</Link>. We will provide you with our Authorised Representatives form to complete.</p>
                                 )}
                             </>
@@ -157,7 +181,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 </CardBody>
             </Card>
 
-        ):(<Welcome />);
+        ) : (<Welcome />);
     };
 
     return (
@@ -224,188 +248,3 @@ MainContent.propTypes = {
     }).isRequired,
     isFormSubmitted: PropTypes.bool.isRequired,
 }
-
-// import React, { useState } from "react";
-// import { motion, AnimatePresence } from "framer-motion";
-// import Welcome from "./steps/Welcome";
-// import SelectSimType from "./steps/SelectSimType";
-// import SelectNumberType from "./steps/SelectNumberType";
-// import AccountDetails from "./steps/AccountDetails";
-// import SelectPlan from "./steps/SelectPlan";
-// import SelectNumber from "./steps/SelectNumber";
-// import Results from "./steps/Results";
-// import NavigationButtons from "./NavigationButtons";
-// import { API_URL } from "../constants";
-// import { Button, Card, CardBody } from "@nextui-org/react";
-
-
-// const SuccessOverlay = ({ custNo, onClose }) => (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//         <Card className="w-96">
-//             <CardBody className="text-center">
-//                 <h2 className="text-2xl font-bold mb-4">Account Created Successfully!</h2>
-//                 <p className="mb-4">Your customer number is:</p>
-//                 <p className="text-3xl font-bold mb-6">{custNo}</p>
-//                 <Button color="primary" className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500" onClick={onClose}>Continue</Button>
-//             </CardBody>
-//         </Card>
-//     </div>
-// );
-
-// export default function MainContent({ currentStep, handleNextStep, handlePrevStep, formData, updateFormData, handleSubmit }) {
-//     const [isAccountDetailsValid, setIsAccountDetailsValid] = useState(false);
-//     const [isLoading, setIsLoading] = useState(false);
-//     const [isSubmitted, setIsSubmitted] = useState(false);
-//     const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
-//     const [custNo, setCustNo] = useState(null);
-
-
-//     const handleAccountDetailsSubmit = async () => {
-//         if (isSubmitted) {
-//             return handleNextStep();
-//         }
-//         if (isAccountDetailsValid) {
-//             setIsLoading(true);
-//             try {
-//                 const customerData = {
-//                     address: formData.address,
-//                     postcode: formData.postcode,
-//                     state: formData.state,
-//                     suburb: formData.suburb,
-//                     custType: formData.custType,
-//                     email: formData.email,
-//                     phone: formData.phoneNumber,
-//                     dob: formData.dob,
-//                     firstName: formData.firstName,
-//                     surname: formData.surname,
-//                     preferredContactMethod: formData.preferredContactMethod,
-//                     sal: formData.sal,
-//                     orderNotificationEmail: formData.email,
-//                 };
-
-//                 const response = await fetch(`${API_URL}/addCustomer`, {
-//                     method: 'POST',
-//                     headers: {
-//                         'Content-Type': 'application/json',
-//                     },
-//                     body: JSON.stringify({ customer: customerData }),
-//                 });
-
-//                 if (!response.ok) {
-//                     throw new Error('Failed to add customer');
-//                 }
-
-//                 const data = await response.json();
-//                 console.log('API Response:', data);
-
-//                 // Save the customer number in the state
-//                 setCustNo(data.return.custNo);
-//                 setIsSubmitted(true);
-//                 updateFormData('custNo', data.return.custNo);
-
-//                 // Show the success overlay
-//                 setShowSuccessOverlay(true);
-//             } catch (error) {
-//                 console.error('Error adding customer:', error);
-//                 // Handle error (you might want to show an error message to the user)
-//             } finally {
-//                 setIsLoading(false);
-//             }
-//         }
-//     };
-
-//     const handleCloseSuccessOverlay = () => {
-//         setShowSuccessOverlay(false);
-//         handleNextStep(); // Proceed to the next step
-//     };
-
-//     const renderStep = () => {
-//         const props = {
-//             handleNextStep,
-//             handlePrevStep,
-//             updateFormData,
-//             formData
-//         };
-//         switch (currentStep) {
-//             case 0: return <Welcome {...props} />;
-//             // case 1: return <SelectSimType {...props} />;
-//             case 1: return <SelectNumberType {...props} />;
-//             case 2: return <AccountDetails
-//                 {...props}
-//                 isLoading={isLoading}
-//                 isSubmitted={isSubmitted}
-//                 onValidationChange={setIsAccountDetailsValid}
-//             />;
-//             case 3: return <SelectPlan {...props} />;
-//             case 4: return <SelectNumber {...props} />;
-//             case 5: return <Results {...props} />;
-
-//             default: return <div>Step not implemented yet</div>;
-//         }
-//     };
-
-//     const getNextButtonDisabledState = (step, formData) => {
-//         switch (step) {
-//             case 0: return false; // Welcome screen
-//             // case 1: return !formData.simType;
-//             case 1: return !formData.numberType;
-//             case 2: return !isAccountDetailsValid || isLoading;
-//             // case 3: return !formData.selectedPlan;
-//             case 4: return !formData.selectedNumber && formData.numberType === 'new';
-//             default: return false;
-//         }
-//     };
-
-//     const getNextButtonHandler = (step) => {
-//         switch (step) {
-//             case 2: return handleAccountDetailsSubmit;
-//             case 5: return handleSubmit;
-//             default: return handleNextStep;
-//         }
-//     };
-
-//     const isLastStep = currentStep === 6; // Now the last step is 5 (SelectNumber)
-
-//     const pageVariants = {
-//         initial: { opacity: 0, x: "-100%" },
-//         in: { opacity: 1, x: 0 },
-//         out: { opacity: 0, x: "100%" }
-//     };
-
-//     const pageTransition = {
-//         type: "tween",
-//         ease: "anticipate",
-//         duration: 0.5
-//     };
-
-//     return (
-//         <main className="flex-1 flex items-center justify-center p-4 md:p-6 overflow-y-auto bg-brand-gradient bg-opacity-20">
-//             <div className="w-full max-w-4xl flex flex-col min-h-[80vh] justify-center">
-//                 <AnimatePresence mode="wait">
-//                     <motion.div
-//                         key={currentStep}
-//                         initial="initial"
-//                         animate="in"
-//                         exit="out"
-//                         variants={pageVariants}
-//                         transition={pageTransition}
-//                         className="flex-grow flex flex-col justify-center bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6"
-//                     >
-//                         {renderStep()}
-//                     </motion.div>
-//                 </AnimatePresence>
-//                 <NavigationButtons
-//                     currentStep={currentStep}
-//                     handlePrevStep={handlePrevStep}
-//                     handleNextStep={getNextButtonHandler(currentStep)}
-//                     isNextDisabled={getNextButtonDisabledState(currentStep, formData)}
-//                     nextButtonText={isLastStep ? "Submit" : (currentStep === 3 && isLoading ? "Submitting..." : "Next")}
-//                     showNextButton={true}
-//                 />
-//             </div>
-//             {showSuccessOverlay && (
-//                 <SuccessOverlay custNo={custNo} onClose={handleCloseSuccessOverlay} />
-//             )}
-//         </main>
-//     );
-// }

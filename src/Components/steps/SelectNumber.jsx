@@ -2,12 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import {
     Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody,
     Link,
-    useDisclosure,
     // Dropdown, DropdownTrigger, DropdownMenu, DropdownItem 
 } from "@nextui-org/react";
 import { API_URL } from "../../constants";
 import PropTypes from 'prop-types';
-import { ClassNames } from "@emotion/react";
 
 const OtpInput = ({ value, onChange, length = 5 }) => {
     const inputs = useRef([]);
