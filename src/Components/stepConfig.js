@@ -6,48 +6,48 @@ export const STEPS = [
       description: 'Get started with Simply Big',
       component: 'Welcome', // This should match the import name in MainContent
     },
-    // {
-    //   key: 'simNumber',
-    //   title: 'Enter SIM Number',
-    //   description: 'Enter the 13 digit number found on the new SIM card we sent you e.g. 4000031612571',
-    //   component: 'SimNumber',
-    // },
+    {
+      key: 'simNumber',
+      title: 'Enter SIM Number',
+      description: 'Enter the 13 digit number found on the new SIM card we sent you e.g. 4000031612571',
+      component: 'SimNumber',
+    },
     {
       key: 'numberType',
       title: 'Select Number Type',
       description: 'Choose between new number or existing number',
       component: 'SelectNumberType',
     },
-    // {
-    //   key: 'accountDetails',
-    //   title: 'Account Details',
-    //   description: 'Enter your billing information',
-    //   component: 'AccountDetails',
-    // },
-    // {
-    //   key: 'selectPlan',
-    //   title: 'International Plan',
-    //   description: 'Upgrade your plan',
-    //   component: 'SelectPlan',
-    // },
+    {
+      key: 'accountDetails',
+      title: 'Account Details',
+      description: 'Enter your billing information',
+      component: 'AccountDetails',
+    },
+    {
+      key: 'selectPlan',
+      title: 'International Plan',
+      description: 'Upgrade your plan',
+      component: 'SelectPlan',
+    },
     {
       key: 'selectNumber',
       title: (formData) => formData.numberType === 'existing' ? 'Confirm Existing Number' : 'Select Number',
       description: (formData) => formData.numberType === 'existing' ? 'Confirm your existing phone number' : 'Choose your phone number',
       component: 'SelectNumber',
     },
-    // {
-    //   key: 'payment',
-    //   title: 'Add your payment method',
-    //   description: 'You can select to pay via card or bank account.',
-    //   component: 'Payment',
-    // },
-    // {
-    //   key: 'consent',
-    //   title: 'Consent',
-    //   description: 'Please sign to indicate that you:',
-    //   component: 'Consent',
-    // },
+    {
+      key: 'payment',
+      title: 'Add your payment method',
+      description: 'You can select to pay via card or bank account.',
+      component: 'Payment',
+    },
+    {
+      key: 'consent',
+      title: 'Consent',
+      description: 'Please sign to indicate that you:',
+      component: 'Consent',
+    },
     {
       key: 'results',
       title: 'Congrats!',
