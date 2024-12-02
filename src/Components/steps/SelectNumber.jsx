@@ -45,7 +45,7 @@ const OtpInput = ({ value, onChange, length = 5 }) => {
         </div>
     );
 };
-export default function SelectNumber({ updateFormData, formData, isFormSubmitted }) {
+export default function SelectNumber({ updateFormData, formData, isFormSubmitted, handleNextStep }) {
     const [availableNumbers, setAvailableNumbers] = useState(formData.availableNumbers || []);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -64,14 +64,17 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${API_URL}/reserveNumber`, {
+            const response = await fetch(`${API_URL}/numbers/reserve`, {
                 method: 'POST'
             });
             if (!response.ok) {
                 throw new Error('Failed to fetch numbers');
             }
             const data = await response.json();
-            if (data.numbers.length == 0) {
+
+            if (!data.status == "success") throw new Error('Failed to fetch numbers', data.message);
+
+            if (data.data.numbers.length == 0) {
                 setAvailableNumbers(prevNumbers => {
                     const newNumbers = [...prevNumbers, { id: "das", number: "90909090" }, { id: "da", number: "90909090" }];
                     updateFormData("availableNumbers", newNumbers);
@@ -80,15 +83,14 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
                 setError(null);
                 // throw new Error('No numbers available right now.')
             }
-
             // setAvailableNumbers(prevNumbers => {
             //     const newNumbers = [...data.numbers, ...prevNumbers];
             //     updateFormData("availableNumbers", newNumbers);
             //     return newNumbers;
             // });
             setAvailableNumbers(() => {
-                updateFormData("availableNumbers", data.numbers);
-                return data.numbers;
+                updateFormData("availableNumbers", data.data.numbers);
+                return data.data.numbers;
             });
         } catch (err) {
             setError(err.message);
@@ -98,40 +100,25 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
         }
     };
 
-    useEffect(() => {
-        if (formData.numberType === "new" && availableNumbers.length === 0 && !initialFetchMade.current) {
-            initialFetchMade.current = true;
-            fetchNumbers();
-        }
-    }, [formData.numberType, availableNumbers.length]);
-
-    useEffect(() => {
-        let interval;
-        if (showOtpModal && timer > 0) {
-            interval = setInterval(() => {
-                setTimer((prevTimer) => prevTimer - 1);
-            }, 1000);
-        }
-        return () => clearInterval(interval);
-    }, [showOtpModal, timer]);
-
     const handleGetOtp = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch(`${API_URL}/getOTP`, {
+            // const response = await fetch(`${API_URL}/auth/otp`, {
+            const response = await fetch(`${API_URL}/auth/otp/email`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    custNo: formData.custNo,
-                    destination: formData.portingNumber,
+                    custNo: "512163",
+                    // custNo: formData.custNo,
+                    // destination: formData.portingNumber,
                 }),
             });
             if (!response.ok) throw new Error('Failed to get OTP');
             const data = await response.json();
             // const data = {return:{getOtp:{transactionId:"ewewew"}}}
-            setTransactionId(data.return.getOtp.transactionId);
+            setTransactionId(data.data.getOtp.transactionId);
             // console.log(data,transactionId)
             setShowOtpModal(true);
             setTimer(300); // Reset timer to 5 minutes
@@ -149,7 +136,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
         if (otp.length !== 6) return;
         setIsLoading(true);
         try {
-            const response = await fetch(`${API_URL}/verifyOTP`, {
+            const response = await fetch(`${API_URL}/auth/otp/verify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -161,15 +148,19 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
             });
             if (!response.ok) throw new Error('Failed to verify OTP');
             const data = await response.json();
+            console.log(data);
             // const data = {verified:true}
-            if (data.verified) {
+            if (data.data.verifyOtp.valid) {
                 setShowOtpModal(false);
+                updateFormData("isNumberVerified", true);
+                handleNextStep();
                 // Handle successful verification (e.g., update formData or move to next step)
             } else {
-                setOtpError('Invalid OTP. Please try again.');
+                throw new Error('Failed to verify OTP');
+                // setOtpError('Invalid OTP. Please try again.');
             }
         } catch (err) {
-            setOtpError('Failed to verify OTP. Please try again.');
+            setOtpError(err);
             console.error(err);
         } finally {
             setIsLoading(false);
@@ -198,18 +189,38 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
             updateFormData("portingNumber", e.target.value);
         }
     };
+
     const handleARNChange = (e) => {
         updateFormData("arn", e.target.value);
     };
+
     const handleDobChange = (e) => {
         updateFormData("dob_port", e.target.value);
     };
+
     // const handleProviderChange = (selectedKeys) => {
     //     updateFormData("provider", Array.from(selectedKeys)[0]);
     // };
     const handleProviderChange = (e) => {
         updateFormData("provider", e.target.value);
     };
+
+    useEffect(() => {
+        if (formData.numberType === "new" && availableNumbers.length === 0 && !initialFetchMade.current) {
+            initialFetchMade.current = true;
+            fetchNumbers();
+        }
+    }, [formData.numberType, availableNumbers.length]);
+
+    useEffect(() => {
+        let interval;
+        if (showOtpModal && timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prevTimer) => prevTimer - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [showOtpModal, timer]);
 
     const renderNumberButtons = () => {
         const buttons = availableNumbers.map((number, i) => (
@@ -322,7 +333,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
                         />
                         <Input
                             label="Date of Birth"
-                            value={formData.dob}
+                            value={formData.dob_port}
                             onChange={handleDobChange}
                             isDisabled={isLoading || isFormSubmitted}
                             type="date"
@@ -331,7 +342,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
                         />
                     </div>
                     <Button
-                        isDisabled={isFormSubmitted || !formData.provider || !formData.arn}
+                        isDisabled={isFormSubmitted || !formData.provider || !formData.arn || !formData.dob_port}
                         color="primary"
                         onClick={handleGetOtp}
                         className="w-full"
@@ -351,7 +362,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
                                         please complete this
                                         <Link href="https://www.emailmeform.com/builder/form/k79Dq4ccdL23">form</Link>.
 
-                                        
+
                                     </p>
                                 </ModalBody>
                             </>
@@ -396,7 +407,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
                             <Button
                                 color="secondary"
                                 onClick={handleGetOtp}
-                                isLoading={isLoading}
+                                // isLoading={isLoading}
                                 isDisabled={timer > 0 || isFormSubmitted}
                                 className="w-full"
                             >
@@ -412,6 +423,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
 
 SelectNumber.propTypes = {
     updateFormData: PropTypes.func.isRequired,
+    handleNextStep: PropTypes.func.isRequired,
     formData: PropTypes.shape({
         // numberType: PropTypes.oneOf(['new','existing'])
         availableNumbers: PropTypes.array,
@@ -421,6 +433,7 @@ SelectNumber.propTypes = {
         arn: PropTypes.string,
         provider: PropTypes.string,
         dob: PropTypes.any,
+        dob_port: PropTypes.any,
         portingNumber: PropTypes.string,
         numberType: PropTypes.oneOf(["new", "existing"])
     }).isRequired,

@@ -26,7 +26,7 @@ export default function App() {
     surname: "",
     email: "",
     sal: "",
-    preferredContactMethod: "EMAIL",
+    preferredContactMethod: "Email",
     dob: "",
     custType: "R",
     suburb: "",
@@ -36,10 +36,9 @@ export default function App() {
     // Plan selection
     selectedPlan: null,
     isUpgraded: false,
-
     provider: "",
-
     paymentToken: '',
+    isNumberVerified: false,
 
     // Number selection (if new number)
     // selectedState: null,
@@ -62,19 +61,30 @@ export default function App() {
 
   useEffect(() => {
     setSteps(getVisibleSteps(formData));
-  }, [formData.numberType]);
+  }, [formData]);
 
   const handleFinalSubmit = async () => {
 
     try {
       if (isFormSubmitted) return;
       // Here you would typically send the formData to your server
-      const response = await fetch(`${API_URL}/activateNewNumber`, {
+      // const response = await fetch(`${API_URL}/activateNewNumber`, {
+      const response = await fetch(`${API_URL}/orders/activate${formData.numberType == "new" ? '' : '/port'}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          number: formData.selectedNumber,
+          planNo: formData.isUpgraded ? "11145178" : "11144638",
+          cust: {
+            suburb: formData.suburb,
+            custNo: formData.custNo,
+            postcode: formData.postcode,
+            address: formData.address,
+            email: formData.email
+          }
+        }),
       });
 
       if (!response.ok) {

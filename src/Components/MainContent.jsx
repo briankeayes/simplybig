@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { API_URL } from "../constants";
 // import { getVisibleSteps } from "./stepConfig";
-import PropTypes from 'prop-types';
+import PropTypes, { bool } from 'prop-types';
 import { CardBody, Card, Link } from "@nextui-org/react";
 
 // Import all step components
@@ -63,7 +63,8 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 abn: formData.abn
             };
 
-            const response = await fetch(`${API_URL}/addCustomer`, {
+            // const response = await fetch(`${API_URL}/addCustomer`, {
+            const response = await fetch(`${API_URL}/customers`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ customer: customerData }),
@@ -71,13 +72,13 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
 
             if (!response.ok) throw new Error('Failed to add customer');
 
-            const data = await response.json();
-            console.log('API Response:', data);
+            const res = await response.json();
+            console.log('API Response:', res);
 
-            setCustNo(data.return.custNo);
+            setCustNo(res.data.custNo);
             setIsSubmitted(true);
-            updateFormData('custNo', data.return.custNo);
-            console.log(custNo)
+            updateFormData('custNo', res.data.custNo);
+            console.log(custNo,res.data.custNo)
             handleNextStep();
         } catch (error) {
             console.error('Error adding customer:', error);
@@ -90,7 +91,9 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
     const handleSelectNumber = useCallback(() => {
         // console.log(formData.selectedNumber)
         // const response = 
-        fetch(`${API_URL}/selectNumber`, {
+        
+        // fetch(`${API_URL}/selectNumber`, {
+        fetch(`${API_URL}/numbers/select`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -113,7 +116,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
         simNumber: !isSimNumberValid,
         numberType: !formData.numberType,
         accountDetails: !isAccountDetailsValid || isLoading,
-        selectNumber: formData.numberType === 'new' ? !formData.selectedNumber : (!formData.arn || !formData.provider),
+        selectNumber: formData.numberType === 'new' ? !formData.selectedNumber : !formData.isNumberVerified,
         payment: !formData.paymentToken,
         consent: !formData.sign
     }), [formData, isAccountDetailsValid, isLoading, isSimNumberValid]);
@@ -235,6 +238,7 @@ MainContent.propTypes = {
         arn: PropTypes.string,
         provider: PropTypes.string,
         phoneNumber: PropTypes.string,
+        isNumberVerified: bool,
         sal: PropTypes.string,
         dob: PropTypes.string,
         dob_port: PropTypes.string,

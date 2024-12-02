@@ -192,10 +192,15 @@ export default function Payment({ updateFormData, formData, isFormSubmitted }) {
         try {
             setShowLoadingOverlay(true);
 
-            const response = await fetch(`${API_URL}/addPaymentMethod`, {
+            
+            // const response = await fetch(`${API_URL}/addPaymentMethod`, {
+            const response = await fetch(`${API_URL}/payments/methods`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ paymentTokenId, custNo }),
+                body: JSON.stringify({ 
+                    paymentTokenId, 
+                    custNo
+                 }),
             });
 
             if (!response.ok) throw new Error('Failed to add payment method');
