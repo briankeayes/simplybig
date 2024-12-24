@@ -103,16 +103,14 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
     const handleGetOtp = async () => {
         setIsLoading(true);
         try {
-            // const response = await fetch(`${API_URL}/auth/otp`, {
-            const response = await fetch(`${API_URL}/auth/otp/email`, {
+            const response = await fetch(`${API_URL}/auth/otp`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    custNo: "512163",
-                    // custNo: formData.custNo,
-                    // destination: formData.portingNumber,
+                    custNo: formData.custNo,
+                    destination: formData.portingNumber,
                 }),
             });
             if (!response.ok) throw new Error('Failed to get OTP');
@@ -182,12 +180,12 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
     };
 
     const handleExistingNumberChange = (e) => {
-        if (!phoneRegex.test(e.target.value)) {
-            setPhErrors("Invalid Australian phone number format");
-        } else {
+        // if (!phoneRegex.test(e.target.value)) {
+        //     setPhErrors("Invalid Australian phone number format");
+        // } else {
             setPhErrors("");
             updateFormData("portingNumber", e.target.value);
-        }
+        // }
     };
 
     const handleARNChange = (e) => {

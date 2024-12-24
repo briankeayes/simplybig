@@ -17,7 +17,7 @@ AccountDetails.propTypes = {
         suburb: PropTypes.string,
         state: PropTypes.string,
         postcode: PropTypes.string,
-        preferredContactMethod: PropTypes.oneOf(['EMAIL', 'SMS', '']),
+        preferredContactMethod: PropTypes.oneOf(['Email', 'SMS', '']),
         custType: PropTypes.oneOf(['B', 'R', '']),
         abn: PropTypes.string,
         custNo: PropTypes.string // For the success message
@@ -33,7 +33,8 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
     const autocompleteInput = useRef(null);
     const [errors, setErrors] = useState({});
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
+    // const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
+    // const phoneRegex = /^(\+61|0)\d{9}$/; // Basic Australian phone number regex
 
     const initAutocomplete = () => {
         if (!autocompleteInput.current) return;
@@ -182,8 +183,8 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             case "phoneNumber":
                 if (!value.trim()) {
                     newErrors.phoneNumber = "Phone number is required";
-                } else if (!phoneRegex.test(value)) {
-                    newErrors.phoneNumber = "Invalid Australian phone number format";
+                // } else if (!phoneRegex.test(value)) {
+                //     newErrors.phoneNumber = "Invalid Australian phone number format";
                 } else {
                     delete newErrors.phoneNumber;
                 }
