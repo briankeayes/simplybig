@@ -10,6 +10,7 @@ export default function App() {
   const [completedSteps, setCompletedSteps] = useState({});
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFormSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [formData, setFormData] = useState({
     // SIM selection
     simType: "physical",
@@ -64,27 +65,39 @@ export default function App() {
   }, [formData]);
 
   const handleFinalSubmit = async () => {
-
     try {
       if (isFormSubmitted) return;
       // Here you would typically send the formData to your server
-      // const response = await fetch(`${API_URL}/activateNewNumber`, {
+      const payload = formData.numberType == 'new' ? {
+        "number": formData.selectedNumber,
+        "planNo": formData.isUpgraded ? "11145178" : "11144638",
+        "cust": {
+          "custNo": formData.custNo,
+          "suburb": formData.suburb,
+          "postcode": formData.postcode,
+          "address": formData.address,
+          "email": formData.email
+        },
+      } : {
+        "number": formData.portingNumber,
+        "numType": formData.numType,
+        "cust": {
+          "custNo": formData.custNo,
+          "suburb": formData.suburb,
+          "postcode": formData.postcode,
+          "address": formData.address,
+          "email": formData.email,
+          "dob": formData.dob_port,
+          "arn": formData.arn
+        },
+        "planNo": formData.isUpgraded ? "11145178" : "11144638"
+      };
       const response = await fetch(`${API_URL}/orders/activate${formData.numberType == "new" ? '' : '/port'}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          number: formData.selectedNumber,
-          planNo: formData.isUpgraded ? "11145178" : "11144638",
-          cust: {
-            suburb: formData.suburb,
-            custNo: formData.custNo,
-            postcode: formData.postcode,
-            address: formData.address,
-            email: formData.email
-          }
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {

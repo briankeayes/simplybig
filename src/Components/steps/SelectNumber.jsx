@@ -55,7 +55,6 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
     const [otpError, setOtpError] = useState("");
     const [timer, setTimer] = useState(300); // 5 minutes in seconds
     const [transactionId, setTransactionId] = useState(null);
-    const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
     const [phErrors, setPhErrors] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     // const providers = ["Telstra", "Optus", "Vodafone"];

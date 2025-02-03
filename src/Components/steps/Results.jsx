@@ -1,4 +1,4 @@
-import { Accordion, AccordionItem, CardBody, Card, CardHeader } from "@nextui-org/react";
+import { Accordion, AccordionItem, CardBody, Card, CardHeader, Spinner } from "@nextui-org/react";
 import PropTypes from 'prop-types';
 
 Results.propTypes = {
@@ -7,9 +7,13 @@ Results.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   isSubmitted: PropTypes.bool.isRequired,
   isFormSubmitted: PropTypes.bool.isRequired,
+  createdOrder: PropTypes.shape({
+    success: PropTypes.bool,
+    orderId: PropTypes.string,
+  })
 };
 
-export default function Results({ isLoading }) {
+export default function Results({ isLoading, createdOrder }) {
   const faqs = [
     {
       title: "How long will activation take?",
@@ -27,7 +31,17 @@ export default function Results({ isLoading }) {
 
   return (
     <div className="w-full max-w-2xl mx-auto text-center justify-content-center">
-      {/* (isLoading && {<p>Submitting your order {}</p>}) */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-midnight bg-opacity-50 flex text-white items-center justify-center z-50">
+          <div className="bg-midnight rounded p-2 flex items-center bg-opacity-90 px-24 py justify-center align-middle">
+            <Spinner size="lg" color="white" />
+            <p className="mt-2 text-white">Creating your order ...</p>
+          </div>
+        </div>
+      )}
+      {createdOrder.success && (
+        <p className="mb-4">Your Order ID is: {createdOrder.orderId}</p>
+      )}
       <p className="mb-4">We will email you once it has been activated, and you can then insert the SIM card. This usually happens within a few minutes but can take longer if we are transferring an existing number.</p>
       <Card className="bg-ocean text-white">
         <CardHeader className="text-2xl mb-4 text-center">

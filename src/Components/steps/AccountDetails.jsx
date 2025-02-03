@@ -183,8 +183,8 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             case "phoneNumber":
                 if (!value.trim()) {
                     newErrors.phoneNumber = "Phone number is required";
-                // } else if (!phoneRegex.test(value)) {
-                //     newErrors.phoneNumber = "Invalid Australian phone number format";
+                    // } else if (!phoneRegex.test(value)) {
+                    //     newErrors.phoneNumber = "Invalid Australian phone number format";
                 } else {
                     delete newErrors.phoneNumber;
                 }
@@ -229,11 +229,20 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
         <div>
 
             {/* <Card className="w-full max-w-2xl mx-auto"> */}
-            {isLoading && (
+            {/* {isLoading && (
                 <div className="fixed inset-0 bg-midnight bg-opacity-50 flex text-white items-center justify-center z-50">
                     <Spinner label="Adding customer..." className="text-white" color="white" />
                 </div>
+            )} */}
+            {isLoading && (
+                <div className="fixed inset-0 bg-midnight bg-opacity-50 flex text-white items-center justify-center z-50">
+                    <div className="bg-midnight rounded p-2 flex items-center bg-opacity-90 px-24 py justify-center align-middle">
+                        <Spinner size="lg" color="white" />
+                        <p className="mt-2 text-white">Adding customer ...</p>
+                    </div>
+                </div>
             )}
+
             {isSubmitted && (
                 <div className="fixed inset-0 bg-midnight bg-opacity-50 flex items-center justify-center z-50">
                     <Card className="w-96 bg-white">

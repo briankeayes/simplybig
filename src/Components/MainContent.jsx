@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { API_URL } from "../constants";
 // import { getVisibleSteps } from "./stepConfig";
@@ -30,12 +30,13 @@ const STEP_COMPONENTS = {
 };
 
 
-export default function MainContent({ steps, currentStep, handleNextStep, handlePrevStep, formData, updateFormData, handleSubmit, isFormSubmitted }) {
+export default function MainContent({ steps, currentStep, handleNextStep, handlePrevStep, formData, updateFormData, isFormSubmitted }) {
     const [isAccountDetailsValid, setIsAccountDetailsValid] = useState(false);
     const [isSimNumberValid, setIsSimNumberValid] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [custNo, setCustNo] = useState(null);
+    const [createdOrder, setOrderCreated] = useState({});
 
     // const steps = useMemo(() => getVisibleSteps(formData), [formData]);
 
@@ -78,7 +79,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
             setCustNo(res.data.custNo);
             setIsSubmitted(true);
             updateFormData('custNo', res.data.custNo);
-            console.log(custNo,res.data.custNo)
+            console.log(custNo, res.data.custNo)
             handleNextStep();
         } catch (error) {
             console.error('Error adding customer:', error);
@@ -86,12 +87,12 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
         } finally {
             setIsLoading(false);
         }
-    },[formData, handleNextStep, updateFormData]);
+    }, [formData, handleNextStep, updateFormData, isAccountDetailsValid, isSubmitted, custNo]);
 
     const handleSelectNumber = useCallback(() => {
         // console.log(formData.selectedNumber)
         // const response = 
-        
+
         // fetch(`${API_URL}/selectNumber`, {
         fetch(`${API_URL}/numbers/select`, {
             method: 'POST',
@@ -102,15 +103,66 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 number: formData.selectedNumber,
             }),
         })
-        .then((data) => data.json())
-        .then((data) => { 
-            console.log(data)
-        }).catch((err) => {
-            console.error(err)
-        })
+            .then((data) => data.json())
+            .then((data) => {
+                console.log(data)
+            }).catch((err) => {
+                console.error(err)
+            })
         return handleNextStep();
 
     }, [formData.selectedNumber, handleNextStep]);
+
+    const handleSubmit = useCallback(async () => {
+        handleNextStep();
+        setIsLoading(true);
+        try {
+            const payload = formData.numberType == 'new' ? {
+                "number": formData.selectedNumber,
+                "planNo": formData.isUpgraded ? "11145178" : "11144638",
+                "cust": {
+                    "custNo": formData.custNo,
+                    "suburb": formData.suburb,
+                    "postcode": formData.postcode,
+                    "address": formData.address,
+                    "email": formData.email
+                },
+            } : {
+                "number": formData.portingNumber,
+                "numType": formData.numType,
+                "cust": {
+                    "custNo": formData.custNo,
+                    "suburb": formData.suburb,
+                    "postcode": formData.postcode,
+                    "address": formData.address,
+                    "email": formData.email,
+                    "dob": formData.dob_port,
+                    "arn": formData.arn
+                },
+                "planNo": formData.isUpgraded ? "11145178" : "11144638"
+            };
+            const response = await fetch(`${API_URL}/orders/activate${formData.numberType == "new" ? '' : '/port'}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) throw new Error('Failed to add customer');
+
+            const res = await response.json();
+            console.log('API Response:', res);
+            if (res.data.errorCode == 0) {
+                setOrderCreated({ success: true, orderId: res.data.orderId });
+            }
+        } catch (error) {
+            console.error('Error creating order:', error);
+            // Handle error (you might want to show an error message to the user)
+        } finally {
+            setIsLoading(false);
+        }
+    }, [formData, handleNextStep]);
 
     const getNextButtonDisabledState = useMemo(() => ({
         simNumber: !isSimNumberValid,
@@ -123,10 +175,8 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
 
     const getNextButtonHandler = useMemo(() => ({
         accountDetails: handleAccountDetailsSubmit,
-        // results: handleSubmit,
         selectNumber: handleSelectNumber,
         consent: handleSubmit,
-        // payment: handleSubmit,
     }), [handleAccountDetailsSubmit, handleSubmit, handleSelectNumber]);
 
     const isLastStep = currentStep === steps.length - 2;
@@ -178,6 +228,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                             isFormSubmitted={isFormSubmitted}
                             setIsSimNumberValid={setIsSimNumberValid}
                             onValidationChange={setIsAccountDetailsValid}
+                            createdOrder={createdOrder}
                         />
 
                     </div>
@@ -224,12 +275,15 @@ MainContent.propTypes = {
     handleNextStep: PropTypes.func.isRequired,
     handlePrevStep: PropTypes.func.isRequired,
     updateFormData: PropTypes.func.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
     steps: PropTypes.any.isRequired,
     formData: PropTypes.shape({
+        isUpgraded: bool,
         simNumber: PropTypes.string,
         numberType: PropTypes.string,
         sign: PropTypes.string,
+        custNo: PropTypes.string,
+        numType: PropTypes.string,
+        portingNumber: PropTypes.string,
         selectedNumber: PropTypes.string,
         paymentToken: PropTypes.string,
         firstName: PropTypes.string,
