@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { API_URL } from "../constants";
 // import { getVisibleSteps } from "./stepConfig";
@@ -30,15 +30,15 @@ const STEP_COMPONENTS = {
 };
 
 
-export default function MainContent({ steps, currentStep, handleNextStep, handlePrevStep, formData, updateFormData, isFormSubmitted }) {
+export default function MainContent({ steps, currentStep, handleNextStep, handlePrevStep, formData, updateFormData }) {
     const [isAccountDetailsValid, setIsAccountDetailsValid] = useState(false);
     const [isSimNumberValid, setIsSimNumberValid] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [custNo, setCustNo] = useState(null);
     const [createdOrder, setOrderCreated] = useState({});
+    const [isFormSubmitted, setFormSubmitted] = useState(false);
 
-    // const steps = useMemo(() => getVisibleSteps(formData), [formData]);
 
     const handleAccountDetailsSubmit = useCallback(async () => {
         if (isSubmitted) return handleNextStep();
@@ -155,6 +155,18 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
             console.log('API Response:', res);
             if (res.data.errorCode == 0) {
                 setOrderCreated({ success: true, orderId: res.data.orderId });
+                setFormSubmitted(true);
+                await fetch(`https://hook.eu2.make.com/u8f97r2gc7geixmf35x8h6uaiyjebgl9`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    mode: 'cors',
+                    body: JSON.stringify({
+                        sessionId: localStorage.getItem('simplyBigSessionId'),
+                        formData: { ...formData, 'orderNo': res.data.orderId }
+                    }),
+                });
+                localStorage.removeItem('simplyBigSessionId');
+                localStorage.setItem('simplyBigSessionId', 'session_' + Math.random().toString(36).substring(2, 9));
             }
         } catch (error) {
             console.error('Error creating order:', error);
@@ -263,9 +275,6 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                     showNextButton={currentStep != steps.length - 1}
                 />
             </div>
-            {/* {showSuccessOverlay && (
-                <SuccessOverlay custNo={custNo} onClose={handleCloseSuccessOverlay} />
-            )} */}
         </main>
     );
 }
@@ -304,5 +313,4 @@ MainContent.propTypes = {
         custType: PropTypes.oneOf(['B', 'R', '']),
         abn: PropTypes.string,
     }).isRequired,
-    isFormSubmitted: PropTypes.bool.isRequired,
 }

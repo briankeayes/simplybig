@@ -169,7 +169,6 @@ export default function Payment({ updateFormData, formData, isFormSubmitted }) {
                 });
             });
 
-            // updateFormData('paymentCompleted', true);
         } catch (error) {
             console.error("Payment failed:", error);
 

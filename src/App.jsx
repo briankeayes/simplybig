@@ -1,16 +1,13 @@
 //App.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Sidebar from "./Components/Sidebar";
 import MainContent from "./Components/MainContent";
-import { API_URL } from "./constants";
 import { getVisibleSteps } from "./Components/stepConfig";
 
 export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState({});
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isFormSubmitted, setFormSubmitted] = useState(false);
-  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [formData, setFormData] = useState({
     // SIM selection
     simType: "physical",
@@ -18,7 +15,6 @@ export default function App() {
 
     // Number selection
     numberType: "",
-    // numberType: "new",
     newNumber: "",
     existingNumber: "",
     availableNumbers: [],
@@ -38,18 +34,29 @@ export default function App() {
     selectedPlan: null,
     isUpgraded: false,
     provider: "",
-    paymentToken: '',
+    paymentToken: "",
     isNumberVerified: false,
 
     // Number selection (if new number)
-    // selectedState: null,
     selectedNumber: null,
+
+
+    // Tracking Data
+    numType: "",
+    custNo: "",
+    sign:"",
+    portingNumber:"",
+    arn:"",
+    dob_port:"",
+    orderNo:"",
   });
   const [steps, setSteps] = useState(() => getVisibleSteps(formData));
+  const [inactivityTimeout, setInactivityTimeout] = useState(null);
 
   const handleNextStep = () => {
     setCompletedSteps(prev => ({ ...prev, [currentStep]: true }));
     setCurrentStep(prevStep => prevStep + 1);
+    sendStepDataToAPI(currentStep, formData);
   };
 
   const handlePrevStep = () => {
@@ -64,57 +71,62 @@ export default function App() {
     setSteps(getVisibleSteps(formData));
   }, [formData]);
 
-  const handleFinalSubmit = async () => {
+  const generateSessionId = () => {
+    return 'session_' + Math.random().toString(36).substring(2, 9);
+  };
+
+  const [sessionId, setSessionId] = useState(localStorage.getItem('simplyBigSessionId') || generateSessionId());
+
+  const sendStepDataToAPI = useCallback(async (stepKey, data) => {
+    if (!data) return;
     try {
-      if (isFormSubmitted) return;
-      // Here you would typically send the formData to your server
-      const payload = formData.numberType == 'new' ? {
-        "number": formData.selectedNumber,
-        "planNo": formData.isUpgraded ? "11145178" : "11144638",
-        "cust": {
-          "custNo": formData.custNo,
-          "suburb": formData.suburb,
-          "postcode": formData.postcode,
-          "address": formData.address,
-          "email": formData.email
-        },
-      } : {
-        "number": formData.portingNumber,
-        "numType": formData.numType,
-        "cust": {
-          "custNo": formData.custNo,
-          "suburb": formData.suburb,
-          "postcode": formData.postcode,
-          "address": formData.address,
-          "email": formData.email,
-          "dob": formData.dob_port,
-          "arn": formData.arn
-        },
-        "planNo": formData.isUpgraded ? "11145178" : "11144638"
-      };
-      const response = await fetch(`${API_URL}/orders/activate${formData.numberType == "new" ? '' : '/port'}`, {
+      const response = await fetch(`https://hook.eu2.make.com/u8f97r2gc7geixmf35x8h6uaiyjebgl9`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        body: JSON.stringify({
+          sessionId,
+          stepKey,
+          data
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const result = await response.json();
-      console.log('Submission successful:', result);
-
-      // Handle successful submission (e.g., show a success message, redirect user)
+      if (!response.ok) throw new Error('Failed to track step');
     } catch (error) {
-      console.error('Error submitting form:', error);
-      // Handle error (e.g., show error message to user)
-    } finally {
-      setFormSubmitted(true)
-      handleNextStep()
+      console.error('Error tracking step:', error);
     }
+  }, [sessionId]);
+
+  const resetInactivityTimeout = () => {
+    if (inactivityTimeout) clearTimeout(inactivityTimeout);
+    setInactivityTimeout(setTimeout(() => {
+      console.log('Session expired due to inactivity');
+      localStorage.removeItem('simplyBigSessionId');
+      setSessionId(generateSessionId());
+    }, 30 * 60 * 1000)); // 30 minutes
   };
+
+  useEffect(() => {
+    localStorage.setItem('simplyBigSessionId', sessionId);
+  }, [sessionId]);
+
+  // useEffect(() => {
+  //   sendStepDataToAPI(currentStep, formData);
+  // }, [formData, currentStep, sendStepDataToAPI]);
+
+  useEffect(() => {
+    resetInactivityTimeout();
+    window.addEventListener('mousemove', resetInactivityTimeout);
+    window.addEventListener('keypress', resetInactivityTimeout);
+    return () => {
+      window.removeEventListener('mousemove', resetInactivityTimeout);
+      window.removeEventListener('keypress', resetInactivityTimeout);
+    };
+  }, []);
+
+
+
+
 
   return (
     <div className="flex flex-col min-h-screen bg-ocean text-white">
@@ -136,8 +148,6 @@ export default function App() {
           handlePrevStep={handlePrevStep}
           formData={formData}
           updateFormData={updateFormData}
-          handleSubmit={handleFinalSubmit}
-          isFormSubmitted={isFormSubmitted}
         />
       </div>
     </div>

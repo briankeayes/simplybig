@@ -25,10 +25,9 @@ AccountDetails.propTypes = {
     onValidationChange: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
     isSubmitted: PropTypes.bool.isRequired,
-    isFormSubmitted: PropTypes.bool.isRequired,
 };
 
-export default function AccountDetails({ updateFormData, formData, onValidationChange, isLoading, isSubmitted, isFormSubmitted }) {
+export default function AccountDetails({ updateFormData, formData, onValidationChange, isLoading, isSubmitted }) {
     const salutations = ["Mr", "Mrs", "Ms", "Mstr", "Miss", "Dr", "Mx", "Other"];
     const autocompleteInput = useRef(null);
     const [errors, setErrors] = useState({});
@@ -216,7 +215,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             variant="bordered"
             errorMessage={errors[name]}
             isInvalid={!!errors[name] || formData[name] === ''}
-            isDisabled={isSubmitted || isLoading || isFormSubmitted}
+            isDisabled={isSubmitted || isLoading}
             type={type}
             placeholder={placeholder}
             isRequired
@@ -273,7 +272,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                     <Dropdown size={"md"}>
                         <DropdownTrigger className="min-h-14">
                             <Button
-                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
+                                isDisabled={isSubmitted || isLoading }
                                 variant="bordered"
                                 className={`w-full justify-start ${errors.sal ? 'border-red-500' : ''}`}
                             >
@@ -309,7 +308,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                     onChange={handleInputChange}
                     variant="bordered"
                     errorMessage={errors.address}
-                    isDisabled={isSubmitted || isLoading || isFormSubmitted}
+                    isDisabled={isSubmitted || isLoading}
                     isInvalid={!!errors.address}
                 />
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -318,60 +317,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                     {renderField("postcode", "Postcode", "Enter your Postcode")}
 
                 </div>
-                {/* <div className="space-y-2">
-                        <h2 className="text-sm font-medium text-gray-600">Preferred Contact Method<span className='text-red-500'>*</span></h2>
-                        <div className="flex gap-4">
-                            <Button
-                                color={formData.preferredContactMethod === "EMAIL" ? "primary" : "default"}
-                                variant={formData.preferredContactMethod === "EMAIL" ? "solid" : "bordered"}
-                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
-                                className="flex-1"
-                                onClick={() => handleContactMethod("EMAIL")}
-                            >
-                                Email
-                            </Button>
-                            <Button
-                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
-                                color={formData.preferredContactMethod === "SMS" ? "primary" : "default"}
-                                variant={formData.preferredContactMethod === "SMS" ? "solid" : "bordered"}
-                                className="flex-1"
-                                onClick={() => handleContactMethod("SMS")}
-                            >
-                                SMS
-                            </Button>
-                        </div>
-                        {errors.preferredContactMethod && <p className="text-red-500 text-sm">{errors.preferredContactMethod}</p>}
-                    </div>
-                    <div className="space-y-2">
-                        <h2 className="text-sm font-medium text-gray-600">Customer Type<span className='text-red-500'>*</span></h2>
-                        <div className="flex gap-4">
-                            <Button
-                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
-                                color={formData.custType === "B" ? "primary" : "default"}
-                                variant={formData.custType === "B" ? "solid" : "bordered"}
-                                className="flex-1"
-                                onClick={() => handleCustType("B")}
-                            >
-                                Business
-                            </Button>
-                            <Button
-                                color={formData.custType === "R" ? "primary" : "default"}
-                                isDisabled={isSubmitted || isLoading || isFormSubmitted}
-                                variant={formData.custType === "R" ? "solid" : "bordered"}
-                                className="flex-1"
-                                onClick={() => handleCustType("R")}
-                            >
-                                Individual
-                            </Button>
-                        </div>
-                        {errors.custType && <p className="text-red-500 text-sm">{errors.custType}</p>}
-                    </div>
-                    {formData.custType === "B" && (
-                        renderField("abn", "Australian Business Number (ABN)", "Enter your ABN")
-                    )} */}
             </form>
-            {/* </CardBody> */}
-            {/* </Card> */}
         </div>
 
     );
