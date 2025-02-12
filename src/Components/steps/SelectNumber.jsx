@@ -192,7 +192,10 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
     };
 
     const handleDobChange = (e) => {
-        updateFormData("dob_port", e.target.value);
+        const dateValue = e.target.value; // "yyyy-mm-dd"
+        const [year, month, day] = dateValue.split('-'); // Split the date into components
+        const formattedDate = `${day}/${month}/${year}`; // Reformat to "dd/mm/yyyy"
+        updateFormData("dob_port", formattedDate);
     };
 
     // const handleProviderChange = (selectedKeys) => {
