@@ -192,10 +192,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
     };
 
     const handleDobChange = (e) => {
-        const dateValue = e.target.value; // "yyyy-mm-dd"
-        const [year, month, day] = dateValue.split('-'); // Split the date into components
-        const formattedDate = `${day}/${month}/${year}`; // Reformat to "dd/mm/yyyy"
-        updateFormData("dob_port", formattedDate);
+        updateFormData("dob_port", e.target.value);
     };
 
     // const handleProviderChange = (selectedKeys) => {
@@ -247,6 +244,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
 
         return <div className="grid grid-cols-2 gap-4 mb-6">{buttons}</div>;
     };
+
     return (
         <div className="w-full max-w-2xl mx-auto">
             {/* <h1 className="text-3xl font-bold text-center text-white mb-4">{title}</h1>

@@ -10,6 +10,7 @@ Results.propTypes = {
   createdOrder: PropTypes.shape({
     success: PropTypes.bool,
     orderId: PropTypes.string,
+    message: PropTypes.string
   })
 };
 
@@ -40,9 +41,15 @@ export default function Results({ isLoading, createdOrder }) {
         </div>
       )}
       {createdOrder.success && (
-        <p className="mb-4">Your Order ID is: {createdOrder.orderId}</p>
+        <>
+          <p className="mb-4">Your Order ID is: {createdOrder.orderId}</p>
+          <p className="mb-4">We will email you once it has been activated, and you can then insert the SIM card. This usually happens within a few minutes but can take longer if we are transferring an existing number.</p>
+        </>
+
       )}
-      <p className="mb-4">We will email you once it has been activated, and you can then insert the SIM card. This usually happens within a few minutes but can take longer if we are transferring an existing number.</p>
+      {createdOrder && !createdOrder.success && createdOrder.message && (
+        <p className="mb-4 text-red-400">Unfortunately we have failed to create order: {createdOrder.message.replace("Unexpected error occured - ", "")}</p>
+      )}
       <Card className="bg-ocean text-white">
         <CardHeader className="text-2xl mb-4 text-center">
           <h3>Commonly asked questions!</h3>

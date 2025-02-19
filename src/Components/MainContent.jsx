@@ -117,6 +117,9 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
         handleNextStep();
         setIsLoading(true);
         try {
+            const [year, month, day] = formData.dob_port.split('-'); // Split the date into components
+            const formattedDate = `${day}/${month}/${year}`; // Reformat to "dd/mm/yyyy"
+    
             const payload = formData.numberType == 'new' ? {
                 "number": formData.selectedNumber,
                 "planNo": formData.isUpgraded ? "11145178" : "11144638",
@@ -129,6 +132,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 },
             } : {
                 "number": formData.portingNumber,
+                "simNo":formData.simNumber,
                 "numType": formData.numType,
                 "cust": {
                     "custNo": formData.custNo,
@@ -136,7 +140,8 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                     "postcode": formData.postcode,
                     "address": formData.address,
                     "email": formData.email,
-                    "dob": formData.dob_port,
+                    // "dob": formData.dob_port,
+                    "dob": formattedDate,
                     "arn": formData.arn
                 },
                 "planNo": formData.isUpgraded ? "11145178" : "11144638"
@@ -149,11 +154,11 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 body: JSON.stringify(payload),
             });
 
-            if (!response.ok) throw new Error('Failed to add customer');
-
+            
             const res = await response.json();
+            // if (!response.ok) throw new Error(res.message);
             console.log('API Response:', res);
-            if (res.data.errorCode == 0) {
+            if (res.status == 'success') {
                 setOrderCreated({ success: true, orderId: res.data.orderId });
                 setFormSubmitted(true);
                 await fetch(`https://hook.eu2.make.com/u8f97r2gc7geixmf35x8h6uaiyjebgl9`, {
@@ -167,9 +172,13 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 });
                 localStorage.removeItem('simplyBigSessionId');
                 localStorage.setItem('simplyBigSessionId', 'session_' + Math.random().toString(36).substring(2, 9));
+            }else{
+                console.log({success: false, message: res.message})
+            setOrderCreated({success: false, message: res.message});
+
             }
         } catch (error) {
-            console.error('Error creating order:', error);
+            // console.log(error);
             // Handle error (you might want to show an error message to the user)
         } finally {
             setIsLoading(false);
