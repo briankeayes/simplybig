@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import PropTypes from 'prop-types';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Card, CardBody, Spinner } from "@nextui-org/react";
 
@@ -35,12 +35,12 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
     // const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
     // const phoneRegex = /^(\+61|0)\d{9}$/; // Basic Australian phone number regex
 
-    const initAutocomplete = () => {
+    const initAutocomplete = useCallback(() => {
         if (!autocompleteInput.current) return;
 
         const autocomplete = new window.google.maps.places.Autocomplete(autocompleteInput.current, {
             componentRestrictions: { country: "au" },
-            fields: ["address_components", "formatted_address"],
+            fields: ["address_components", "formatted_address", "geometry"],
             types: ["address"],
         });
 
@@ -51,6 +51,9 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             let postcode = "";
             let state = "";
             let suburb = "";
+            let route = "";
+            let street_number = "";
+            let formatted_address = place.formatted_address;
 
             for (const component of place.address_components) {
                 const componentType = component.types[0];
@@ -64,15 +67,43 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                     case "locality":
                         suburb = component.long_name;
                         break;
+                    case "street_number":
+                        street_number = component.long_name;
+                        break;
+                    case "route":
+                        route = component.long_name;
+                        break;
+                }
+            }
+            // Check if the formatted address includes the street number
+            if (street_number && !formatted_address.startsWith(street_number)) {
+                // Extract the parts of the address
+                const addressParts = formatted_address.split(',');
+
+                // Check if the first part contains just the route
+                if (addressParts[0].trim() === route) {
+                    // Replace the first part with street number + route
+                    addressParts[0] = `${street_number} ${route}`;
+                    formatted_address = addressParts.join(',');
+                }
+            }
+            // If we still don't have a street number in the formatted address,
+            // check if it's in the user's input
+            if (street_number === "") {
+                const userInput = autocompleteInput.current.value;
+                const potentialStreetNumber = userInput.split(' ')[0];
+                if (/^\d+$/.test(potentialStreetNumber)) {
+                    street_number = potentialStreetNumber;
+                    formatted_address = `${street_number} ${formatted_address}`;
                 }
             }
 
-            updateFormData("address", place.formatted_address);
+            updateFormData("address", formatted_address);
             updateFormData("postcode", postcode);
             updateFormData("state", state);
             updateFormData("suburb", suburb);
         });
-    };
+    }, [autocompleteInput, updateFormData]);
 
     useEffect(() => {
         // Load Google Maps JavaScript API script
@@ -272,7 +303,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                     <Dropdown size={"md"}>
                         <DropdownTrigger className="min-h-14">
                             <Button
-                                isDisabled={isSubmitted || isLoading }
+                                isDisabled={isSubmitted || isLoading}
                                 variant="bordered"
                                 className={`w-full justify-start ${errors.sal ? 'border-red-500' : ''}`}
                             >
