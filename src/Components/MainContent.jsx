@@ -123,6 +123,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
             const payload = formData.numberType == 'new' ? {
                 "number": formData.selectedNumber,
                 "planNo": formData.isUpgraded ? "11145178" : "11144638",
+                "simNo":formData.simNumber,
                 "cust": {
                     "custNo": formData.custNo,
                     "suburb": formData.suburb,
