@@ -1,5 +1,5 @@
-import React from "react";
 import { Button } from "@nextui-org/react";
+import PropTypes from 'prop-types';
 
 export default function SelectSimType({ updateFormData, formData, handleNextStep, isFormSubmitted }) {
     const handleSimTypeChange = (type) => {
@@ -32,3 +32,12 @@ export default function SelectSimType({ updateFormData, formData, handleNextStep
         </div>
     );
 }
+
+SelectSimType.propTypes = {
+    updateFormData: PropTypes.func.isRequired,
+    formData: PropTypes.shape({
+        simType: PropTypes.string
+    }).isRequired,
+    handleNextStep: PropTypes.func.isRequired,
+    isFormSubmitted: PropTypes.bool.isRequired
+};

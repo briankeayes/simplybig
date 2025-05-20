@@ -44,11 +44,11 @@ export default function App() {
     // Tracking Data
     numType: "",
     custNo: "",
-    sign:"",
-    portingNumber:"",
-    arn:"",
-    dob_port:"",
-    orderNo:"",
+    sign: "",
+    portingNumber: "",
+    arn: "",
+    dob_port: "",
+    orderNo: "",
   });
   const [steps, setSteps] = useState(() => getVisibleSteps(formData));
   const [inactivityTimeout, setInactivityTimeout] = useState(null);
@@ -97,14 +97,15 @@ export default function App() {
     }
   }, [sessionId]);
 
-  const resetInactivityTimeout = () => {
+  //convert to useCallback
+  const resetInactivityTimeout = useCallback(() => {
     if (inactivityTimeout) clearTimeout(inactivityTimeout);
     setInactivityTimeout(setTimeout(() => {
       console.log('Session expired due to inactivity');
       localStorage.removeItem('simplyBigSessionId');
       setSessionId(generateSessionId());
     }, 30 * 60 * 1000)); // 30 minutes
-  };
+  }, [inactivityTimeout]);
 
   useEffect(() => {
     localStorage.setItem('simplyBigSessionId', sessionId);
@@ -122,7 +123,7 @@ export default function App() {
       window.removeEventListener('mousemove', resetInactivityTimeout);
       window.removeEventListener('keypress', resetInactivityTimeout);
     };
-  }, []);
+  }, [resetInactivityTimeout]);
 
 
 

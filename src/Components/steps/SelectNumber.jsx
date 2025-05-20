@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
     Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody,
     Link,
@@ -59,7 +59,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
     const [isModalOpen, setIsModalOpen] = useState(false);
     // const providers = ["Telstra", "Optus", "Vodafone"];
 
-    const fetchNumbers = async () => {
+    const fetchNumbers = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
@@ -97,7 +97,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [updateFormData]);
 
     const handleGetOtp = async () => {
         setIsLoading(true);
@@ -207,7 +207,7 @@ export default function SelectNumber({ updateFormData, formData, isFormSubmitted
             initialFetchMade.current = true;
             fetchNumbers();
         }
-    }, [formData.numberType, availableNumbers.length]);
+    }, [formData.numberType, availableNumbers.length, fetchNumbers]);
 
     useEffect(() => {
         let interval;
