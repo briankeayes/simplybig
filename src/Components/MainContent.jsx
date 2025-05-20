@@ -65,7 +65,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
             };
 
             // const response = await fetch(`${API_URL}/addCustomer`, {
-            const response = await fetch(`${API_URL}/customers`, {
+            const response = await  fetch(`${API_URL}/customers`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ customer: customerData }),
