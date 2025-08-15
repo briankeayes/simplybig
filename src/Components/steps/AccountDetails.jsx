@@ -30,6 +30,7 @@ AccountDetails.propTypes = {
 export default function AccountDetails({ updateFormData, formData, onValidationChange, isLoading, isSubmitted }) {
     const salutations = ["Mr", "Mrs", "Ms", "Mstr", "Miss", "Dr", "Mx", "Other"];
     const autocompleteInput = useRef(null);
+    const scriptLoadedRef = useRef(false);
     const [errors, setErrors] = useState({});
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
@@ -106,7 +107,27 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
     }, [autocompleteInput, updateFormData]);
 
     useEffect(() => {
+        // Check if Google Maps API is already loaded
+        if (window.google && window.google.maps) {
+            initAutocomplete();
+            return;
+        }
+
+        // Check if script is already being loaded
+        if (scriptLoadedRef.current) {
+            return;
+        }
+
+        // Check if script tag already exists
+        const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+        if (existingScript) {
+            scriptLoadedRef.current = true;
+            existingScript.addEventListener('load', initAutocomplete);
+            return;
+        }
+
         // Load Google Maps JavaScript API script
+        scriptLoadedRef.current = true;
         const script = document.createElement('script');
         script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBXHTUncWjY6ht1WEWVhTIV4KIfferln3g&libraries=places`;
         script.async = true;
@@ -114,7 +135,10 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
         document.body.appendChild(script);
 
         return () => {
-            document.body.removeChild(script);
+            // Clean up event listener if we added one to existing script
+            if (existingScript) {
+                existingScript.removeEventListener('load', initAutocomplete);
+            }
         };
     }, [initAutocomplete]);
 

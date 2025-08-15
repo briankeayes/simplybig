@@ -105,7 +105,7 @@ export default function App() {
       localStorage.removeItem('simplyBigSessionId');
       setSessionId(generateSessionId());
     }, 30 * 60 * 1000)); // 30 minutes
-  }, [inactivityTimeout]);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('simplyBigSessionId', sessionId);
