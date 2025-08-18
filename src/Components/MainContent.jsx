@@ -119,12 +119,14 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
         try {
             const [year, month, day] = formData.dob_port.split('-'); // Split the date into components
             const formattedDate = `${day}/${month}/${year}`; // Reformat to "dd/mm/yyyy"
-    
+
             const payload = formData.numberType == 'new' ? {
                 "number": formData.selectedNumber,
                 "planNo": formData.isUpgraded ? "11145178" : "11144638",
-                "simNo":formData.simNumber,
+                "simNo": formData.simNumber,
                 "cust": {
+                    "fullName": formData.firstName + " " + formData.surname,
+                    "firstName": formData.firstName,
                     "custNo": formData.custNo,
                     "suburb": formData.suburb,
                     "postcode": formData.postcode,
@@ -133,9 +135,11 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 },
             } : {
                 "number": formData.portingNumber,
-                "simNo":formData.simNumber,
+                "simNo": formData.simNumber,
                 "numType": formData.numType,
                 "cust": {
+                    "fullName": formData.firstName + " " + formData.surname,
+                    "firstName": formData.firstName,
                     "custNo": formData.custNo,
                     "suburb": formData.suburb,
                     "postcode": formData.postcode,
@@ -155,7 +159,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 body: JSON.stringify(payload),
             });
 
-            
+
             const res = await response.json();
             // if (!response.ok) throw new Error(res.message);
             console.log('API Response:', res);
@@ -173,9 +177,9 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 });
                 localStorage.removeItem('simplyBigSessionId');
                 localStorage.setItem('simplyBigSessionId', 'session_' + Math.random().toString(36).substring(2, 9));
-            }else{
-                console.log({success: false, message: res.message})
-            setOrderCreated({success: false, message: res.message});
+            } else {
+                console.log({ success: false, message: res.message })
+                setOrderCreated({ success: false, message: res.message });
 
             }
         } catch (error) {
