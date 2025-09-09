@@ -1,0 +1,2 @@
+export const TM_API_URL = import.meta.env.VITE_TM_API_URL || "https://telco-manager.vercel.app/api/webhook/simplybig";
+export const TM_API_KEY = import.meta.env.VITE_TM_API_KEY || "c094d42f-f9b3-40f0-bd22-102984832249";

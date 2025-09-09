@@ -16,9 +16,11 @@ import Results from "./steps/Results";
 import NavigationButtons from "./NavigationButtons";
 import SimNumber from "./steps/SIMNumber";
 import Consent from "./steps/Consent";
+import SelectSimType from "./steps/SelectSimType";
 
 const STEP_COMPONENTS = {
     Welcome,
+    SelectSimType,
     SimNumber,
     SelectNumberType,
     AccountDetails,
@@ -30,7 +32,7 @@ const STEP_COMPONENTS = {
 };
 
 
-export default function MainContent({ steps, currentStep, handleNextStep, handlePrevStep, formData, updateFormData }) {
+export default function MainContent({ steps, currentStep, handleNextStep, handlePrevStep, formData, updateFormData, sendStepDataToAPI }) {
     const [isAccountDetailsValid, setIsAccountDetailsValid] = useState(false);
     const [isSimNumberValid, setIsSimNumberValid] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -79,8 +81,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
             setCustNo(res.data.custNo);
             setIsSubmitted(true);
             updateFormData('custNo', res.data.custNo);
-            console.log(custNo, res.data.custNo)
-            handleNextStep();
+            handleNextStep({ ...formData, custNo: res.data.custNo });
         } catch (error) {
             console.error('Error adding customer:', error);
             // Handle error (you might want to show an error message to the user)
@@ -124,6 +125,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 "number": formData.selectedNumber,
                 "planNo": formData.isUpgraded ? "11145178" : "11144638",
                 "simNo": formData.simNumber,
+                "simType": formData.simType,
                 "cust": {
                     "fullName": formData.firstName + " " + formData.surname,
                     "firstName": formData.firstName,
@@ -136,7 +138,8 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
             } : {
                 "number": formData.portingNumber,
                 "simNo": formData.simNumber,
-                "numType": formData.numType,
+                "simType": formData.simType,
+                "planNo": formData.isUpgraded ? "11145178" : "11144638",
                 "cust": {
                     "fullName": formData.firstName + " " + formData.surname,
                     "firstName": formData.firstName,
@@ -149,7 +152,6 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                     "dob": formattedDate,
                     "arn": formData.arn
                 },
-                "planNo": formData.isUpgraded ? "11145178" : "11144638"
             };
             const response = await fetch(`${API_URL}/orders/activate${formData.numberType == "new" ? '' : '/port'}`, {
                 method: 'POST',
@@ -161,11 +163,20 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
 
 
             const res = await response.json();
+            // const res = {status: 'success', data: {orderId: '123'}};
             // if (!response.ok) throw new Error(res.message);
             console.log('API Response:', res);
             if (res.status == 'success') {
                 setOrderCreated({ success: true, orderId: res.data.orderId });
                 setFormSubmitted(true);
+                
+                // Update formData with the orderNo
+                updateFormData('orderNo', res.data.orderId);
+                
+                // Send form_submitted event with orderNo
+                const finalData = { ...formData, orderNo: res.data.orderId };
+                sendStepDataToAPI('results', finalData, 'form_submitted');
+                
                 await fetch(`https://hook.eu2.make.com/u8f97r2gc7geixmf35x8h6uaiyjebgl9`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -188,7 +199,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
         } finally {
             setIsLoading(false);
         }
-    }, [formData, handleNextStep]);
+    }, [formData, handleNextStep, updateFormData, sendStepDataToAPI]);
 
     const getNextButtonDisabledState = useMemo(() => ({
         simNumber: !isSimNumberValid,
@@ -298,6 +309,7 @@ MainContent.propTypes = {
     handleNextStep: PropTypes.func.isRequired,
     handlePrevStep: PropTypes.func.isRequired,
     updateFormData: PropTypes.func.isRequired,
+    sendStepDataToAPI: PropTypes.func.isRequired,
     steps: PropTypes.any.isRequired,
     formData: PropTypes.shape({
         isUpgraded: bool,
@@ -306,6 +318,7 @@ MainContent.propTypes = {
         sign: PropTypes.string,
         custNo: PropTypes.string,
         numType: PropTypes.string,
+        simType: PropTypes.string,
         portingNumber: PropTypes.string,
         selectedNumber: PropTypes.string,
         paymentToken: PropTypes.string,

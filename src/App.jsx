@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from "react";
 import Sidebar from "./Components/Sidebar";
 import MainContent from "./Components/MainContent";
 import { getVisibleSteps } from "./Components/stepConfig";
+import { sendWebhook } from "./utils/fetcher";
+import { sendStepData, sendStepStarted } from "./utils/tracking";
 
 export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -10,7 +12,7 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     // SIM selection
-    simType: "physical",
+    simType: "",
     simNumber: "",
 
     // Number selection
@@ -53,14 +55,30 @@ export default function App() {
   const [steps, setSteps] = useState(() => getVisibleSteps(formData));
   const [inactivityTimeout, setInactivityTimeout] = useState(null);
 
-  const handleNextStep = () => {
+  const handleNextStep = (updatedData = null) => {
     setCompletedSteps(prev => ({ ...prev, [currentStep]: true }));
-    setCurrentStep(prevStep => prevStep + 1);
-    sendStepDataToAPI(currentStep, formData);
+    const nextStep = currentStep + 1;
+    setCurrentStep(nextStep);
+    sendStepDataToAPI(steps[currentStep].key, updatedData || formData);
+    
+    // Send step_started for the next step with a small delay to ensure proper ordering
+    if (nextStep > 0 && steps[nextStep]) {
+      setTimeout(() => {
+        sendStepStartedToAPI(steps[nextStep].key, updatedData || formData);
+      }, 500);
+    }
   };
 
   const handlePrevStep = () => {
-    setCurrentStep(prevStep => prevStep - 1);
+    const prevStep = currentStep - 1;
+    setCurrentStep(prevStep);
+    
+    // Send step_started for the previous step with a small delay
+    if (prevStep >= 0 && steps[prevStep]) {
+      setTimeout(() => {
+        sendStepStartedToAPI(steps[prevStep].key, formData);
+      }, 500);
+    }
   };
 
   const updateFormData = (key, value) => {
@@ -69,33 +87,31 @@ export default function App() {
 
   useEffect(() => {
     setSteps(getVisibleSteps(formData));
+    console.log("formData", formData);
   }, [formData]);
 
   const generateSessionId = () => {
-    return 'session_' + Math.random().toString(36).substring(2, 9);
+    const sessionId = 'session_' + Math.random().toString(36).substring(2, 9);
+
+    return sessionId;
   };
 
   const [sessionId, setSessionId] = useState(localStorage.getItem('simplyBigSessionId') || generateSessionId());
 
-  const sendStepDataToAPI = useCallback(async (stepKey, data) => {
-    if (!data) return;
-    try {
-      const response = await fetch(`https://hook.eu2.make.com/u8f97r2gc7geixmf35x8h6uaiyjebgl9`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        mode: 'cors',
-        body: JSON.stringify({
-          sessionId,
-          stepKey,
-          data
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to track step');
-    } catch (error) {
-      console.error('Error tracking step:', error);
+  useEffect(() => {
+    if (sessionId) {
+      sendWebhook('session_started', sessionId, 'welcome');
     }
   }, [sessionId]);
+
+  // Simple wrappers that pass sessionId to utils functions
+  const sendStepDataToAPI = (stepKey, data, eventType = 'step_completed') => {
+    sendStepData(stepKey, data, sessionId, eventType);
+  };
+
+  const sendStepStartedToAPI = (stepKey, data) => {
+    sendStepStarted(stepKey, data, sessionId);
+  };
 
   //convert to useCallback
   const resetInactivityTimeout = useCallback(() => {
@@ -149,6 +165,7 @@ export default function App() {
           handlePrevStep={handlePrevStep}
           formData={formData}
           updateFormData={updateFormData}
+          sendStepDataToAPI={sendStepDataToAPI}
         />
       </div>
     </div>
