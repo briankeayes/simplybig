@@ -6,12 +6,12 @@ export const STEPS = [
     description: 'Get started with Simply Big',
     component: 'Welcome', // This should match the import name in MainContent
   },
-  {
-    key: "simType",
-    title: "Select SIM Type",
-    description: "Choose between new SIM card or existing SIM card",
-    component: "SelectSimType",
-  },
+  // {
+  //   key: "simType",
+  //   title: "Select SIM Type",
+  //   description: "Choose between new SIM card or existing SIM card",
+  //   component: "SelectSimType",
+  // },
   {
     key: 'simNumber',
     title: 'Enter SIM Number',
