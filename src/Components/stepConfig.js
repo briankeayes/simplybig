@@ -17,7 +17,7 @@ export const STEPS = [
     title: 'Enter SIM Number',
     description: 'Enter the 13 digit number found on the new SIM card we sent you e.g. 4000031612571',
     component: 'SimNumber',
-    condition: (formData) => formData.simType === "physical", // Only show for physical SIM
+    // condition: (formData) => formData.simType === "physical", // Only show for physical SIM
   },
   {
     key: 'numberType',
