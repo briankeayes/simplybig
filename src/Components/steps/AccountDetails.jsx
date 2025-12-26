@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import PropTypes from 'prop-types';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Card, CardBody, Spinner } from "@nextui-org/react";
-
 AccountDetails.propTypes = {
     // title: PropTypes.string.isRequired,
     // description: PropTypes.string.isRequired,
@@ -33,9 +32,9 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
     const scriptLoadedRef = useRef(false);
     const [errors, setErrors] = useState({});
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const GOOGLE_MAPS_API_KEY = "AIzaSyB5VQYTTrCU3__S5lwE9Z5dfOnPpbA6r8I"; // brian's api key
     // const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
     // const phoneRegex = /^(\+61|0)\d{9}$/; // Basic Australian phone number regex
-
     const initAutocomplete = useCallback(() => {
         if (!autocompleteInput.current) return;
 
@@ -129,7 +128,8 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
         // Load Google Maps JavaScript API script
         scriptLoadedRef.current = true;
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDVWAwkmRD8MBJJEwtjNNnx0caC12Q5HY0&libraries=places`;
+        // script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBXHTUncWjY6ht1WEWVhTIV4KIfferln3g&libraries=places`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
         script.async = true;
         script.onload = initAutocomplete;
         document.body.appendChild(script);
