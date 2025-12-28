@@ -32,7 +32,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
     const scriptLoadedRef = useRef(false);
     const [errors, setErrors] = useState({});
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const GOOGLE_MAPS_API_KEY = "AIzaSyB5VQYTTrCU3__S5lwE9Z5dfOnPpbA6r8I"; // brian's api key
+    const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // brian's api key
     // const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
     // const phoneRegex = /^(\+61|0)\d{9}$/; // Basic Australian phone number regex
     const initAutocomplete = useCallback(() => {
