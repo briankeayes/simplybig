@@ -132,7 +132,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                     "custNo": formData.custNo,
                     "suburb": formData.suburb,
                     "postcode": formData.postcode,
-                    "address": formData.address,
+                    "address": formData.address + " " + formData.suburb + " " + formData.state + " " + formData.postcode,
                     "email": formData.email
                 },
             } : {
@@ -146,7 +146,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                     "custNo": formData.custNo,
                     "suburb": formData.suburb,
                     "postcode": formData.postcode,
-                    "address": formData.address,
+                    "address": formData.address + " " + formData.suburb + " " + formData.state + " " + formData.postcode,
                     "email": formData.email,
                     // "dob": formData.dob_port,
                     "dob": formattedDate,
