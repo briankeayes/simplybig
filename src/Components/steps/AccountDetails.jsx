@@ -128,7 +128,6 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
         // Load Google Maps JavaScript API script
         scriptLoadedRef.current = true;
         const script = document.createElement('script');
-        // script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBXHTUncWjY6ht1WEWVhTIV4KIfferln3g&libraries=places`;
         script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
         script.async = true;
         script.onload = initAutocomplete;
