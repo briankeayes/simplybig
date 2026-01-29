@@ -137,6 +137,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                 },
             } : {
                 "number": formData.portingNumber,
+                "numType": formData.numType,
                 "simNo": formData.simNumber,
                 "simType": formData.simType,
                 "planNo": formData.isUpgraded ? "11145178" : "11144638",
