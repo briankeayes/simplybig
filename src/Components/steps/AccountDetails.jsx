@@ -102,6 +102,11 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             updateFormData("state", state);
             updateFormData("suburb", suburb);
             setAddressSelectedFromAutocomplete(true);
+            setErrors(prev => {
+                const updated = { ...prev };
+                delete updated.address;
+                return updated;
+            });
         });
     }, [autocompleteInput, updateFormData]);
 
