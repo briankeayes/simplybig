@@ -31,10 +31,9 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
     const autocompleteInput = useRef(null);
     const scriptLoadedRef = useRef(false);
     const [errors, setErrors] = useState({});
+    const [addressSelectedFromAutocomplete, setAddressSelectedFromAutocomplete] = useState(false);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // brian's api key
-    // const phoneRegex = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/; // Basic Australian phone number regex
-    // const phoneRegex = /^(\+61|0)\d{9}$/; // Basic Australian phone number regex
+    const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const initAutocomplete = useCallback(() => {
         if (!autocompleteInput.current) return;
 
@@ -102,6 +101,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             updateFormData("postcode", postcode);
             updateFormData("state", state);
             updateFormData("suburb", suburb);
+            setAddressSelectedFromAutocomplete(true);
         });
     }, [autocompleteInput, updateFormData]);
 
@@ -144,8 +144,23 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+
+        if (name === "phoneNumber") {
+            const digitsOnly = value.replace(/\D/g, "").slice(0, 10);
+            updateFormData(name, digitsOnly);
+            validateField(name, digitsOnly);
+            return;
+        }
+
         updateFormData(name, value);
         validateField(name, value);
+
+        if (name === "address") {
+            setAddressSelectedFromAutocomplete(false);
+            updateFormData("suburb", "");
+            updateFormData("state", "");
+            updateFormData("postcode", "");
+        }
     };
 
     // const handleContactMethod = (method) => {
@@ -208,6 +223,8 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
             case "address":
                 if (!value.trim()) {
                     newErrors.address = "Address is required";
+                } else if (!addressSelectedFromAutocomplete) {
+                    newErrors.address = "Please select an address from the dropdown suggestions";
                 } else {
                     delete newErrors.address;
                 }
@@ -234,10 +251,12 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                 }
                 break;
             case "phoneNumber":
-                if (!value.trim()) {
+                if (!value) {
                     newErrors.phoneNumber = "Phone number is required";
-                    // } else if (!phoneRegex.test(value)) {
-                    //     newErrors.phoneNumber = "Invalid Australian phone number format";
+                } else if (!value.startsWith("04")) {
+                    newErrors.phoneNumber = "Phone number must start with 04";
+                } else if (value.length !== 10) {
+                    newErrors.phoneNumber = "Phone number must be 10 digits (e.g. 0412345678)";
                 } else {
                     delete newErrors.phoneNumber;
                 }
@@ -252,13 +271,13 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
     useEffect(() => {
         const validateForm = () => {
             const requiredFields = ['firstName', 'surname', 'email', 'address', 'postcode', 'state', 'suburb', 'custType', 'dob', 'preferredContactMethod', 'sal'];
-            const isValid = requiredFields.every(field => formData[field]) && Object.keys(errors).length === 0;
+            const isValid = requiredFields.every(field => formData[field]) && addressSelectedFromAutocomplete && Object.keys(errors).length === 0;
             onValidationChange(isValid);
             return isValid;
         };
 
         validateForm();
-    }, [formData, errors, onValidationChange]);
+    }, [formData, errors, onValidationChange, addressSelectedFromAutocomplete]);
 
     const renderField = (name, label, placeholder, type = "text", description = '') => (
         <Input
@@ -318,7 +337,7 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {renderField("email", "Email", "email@company.com", 'email', 'We will send your monthly invoice to this email address')}
 
-                    {renderField("phoneNumber", "Phone Number", "Enter your phone number", 'text', 'Your best number for us to contact you about your account e.g. 0412345678')}
+                    {renderField("phoneNumber", "Phone Number", "0412345678", 'tel', 'Australian mobile number starting with 04')}
 
                 </div>
 
@@ -352,24 +371,50 @@ export default function AccountDetails({ updateFormData, formData, onValidationC
                     {renderField("dob", "Date of Birth", "Select your date of birth", "date")}
 
                 </div>
-                <Input
-                    isRequired
-                    ref={autocompleteInput}
-                    label="Address"
-                    name="address"
-                    placeholder="Start typing your address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    variant="bordered"
-                    errorMessage={errors.address}
-                    isDisabled={isSubmitted || isLoading}
-                    isInvalid={!!errors.address}
-                />
+                <div>
+                    <Input
+                        isRequired
+                        ref={autocompleteInput}
+                        label="Address"
+                        name="address"
+                        placeholder="Start typing your address"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        variant="bordered"
+                        errorMessage={errors.address}
+                        isDisabled={isSubmitted || isLoading}
+                        isInvalid={!!errors.address}
+                        description="Start typing and select your Australian address from the dropdown"
+                    />
+                </div>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                    {renderField("suburb", "Suburb", "Enter your Suburb")}
-                    {renderField("state", "State", "Enter your State")}
-                    {renderField("postcode", "Postcode", "Enter your Postcode")}
-
+                    <Input
+                        label="Suburb"
+                        name="suburb"
+                        value={formData.suburb}
+                        variant="bordered"
+                        isDisabled
+                        isRequired
+                        placeholder="Auto-filled from address"
+                    />
+                    <Input
+                        label="State"
+                        name="state"
+                        value={formData.state}
+                        variant="bordered"
+                        isDisabled
+                        isRequired
+                        placeholder="Auto-filled from address"
+                    />
+                    <Input
+                        label="Postcode"
+                        name="postcode"
+                        value={formData.postcode}
+                        variant="bordered"
+                        isDisabled
+                        isRequired
+                        placeholder="Auto-filled from address"
+                    />
                 </div>
             </form>
         </div>
