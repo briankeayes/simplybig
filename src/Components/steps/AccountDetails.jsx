@@ -441,7 +441,7 @@ export default function AccountDetails({
           )}
         </div>
         <div>
-          <p className="text-default-500 text-xs">
+          <p className="text-default-500 text-xs mb-2">
             <b>Australian address required.</b> This is the address also
             provided to emergency services for the end user.
           </p>
