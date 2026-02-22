@@ -184,7 +184,7 @@ export default function MainContent({ steps, currentStep, handleNextStep, handle
                     mode: 'cors',
                     body: JSON.stringify({
                         sessionId: localStorage.getItem('simplyBigSessionId'),
-                        formData: { ...formData, 'orderNo': res.data.orderId }
+                        data: { ...formData, 'orderNo': res.data.orderId }
                     }),
                 });
                 localStorage.removeItem('simplyBigSessionId');
