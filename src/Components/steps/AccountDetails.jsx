@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   Dropdown,
@@ -44,129 +44,8 @@ export default function AccountDetails({
   isSubmitted,
 }) {
   const salutations = ["Mr", "Mrs", "Ms", "Mstr", "Miss", "Dr", "Mx", "Other"];
-  const autocompleteInput = useRef(null);
-  const scriptLoadedRef = useRef(false);
   const [errors, setErrors] = useState({});
-  const [addressSelectedFromAutocomplete, setAddressSelectedFromAutocomplete] =
-    useState(false);
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const initAutocomplete = useCallback(() => {
-    if (!autocompleteInput.current) return;
-
-    const autocomplete = new window.google.maps.places.Autocomplete(
-      autocompleteInput.current,
-      {
-        componentRestrictions: { country: "au" },
-        fields: ["address_components", "formatted_address", "geometry"],
-        types: ["address"],
-      },
-    );
-
-    autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-      if (!place.address_components) return;
-
-      let postcode = "";
-      let state = "";
-      let suburb = "";
-      let route = "";
-      let street_number = "";
-      let formatted_address = place.formatted_address;
-
-      for (const component of place.address_components) {
-        const componentType = component.types[0];
-        switch (componentType) {
-          case "postal_code":
-            postcode = component.long_name;
-            break;
-          case "administrative_area_level_1":
-            state = component.short_name;
-            break;
-          case "locality":
-            suburb = component.long_name;
-            break;
-          case "street_number":
-            street_number = component.long_name;
-            break;
-          case "route":
-            route = component.long_name;
-            break;
-        }
-      }
-      // Check if the formatted address includes the street number
-      if (street_number && !formatted_address.startsWith(street_number)) {
-        // Extract the parts of the address
-        const addressParts = formatted_address.split(",");
-
-        // Check if the first part contains just the route
-        if (addressParts[0].trim() === route) {
-          // Replace the first part with street number + route
-          addressParts[0] = `${street_number} ${route}`;
-          formatted_address = addressParts.join(",");
-        }
-      }
-      // If we still don't have a street number in the formatted address,
-      // check if it's in the user's input
-      if (street_number === "") {
-        const userInput = autocompleteInput.current.value;
-        const potentialStreetNumber = userInput.split(" ")[0];
-        if (/^\d+$/.test(potentialStreetNumber)) {
-          street_number = potentialStreetNumber;
-          formatted_address = `${street_number} ${formatted_address}`;
-        }
-      }
-
-      updateFormData("address", formatted_address);
-      updateFormData("postcode", postcode);
-      updateFormData("state", state);
-      updateFormData("suburb", suburb);
-      setAddressSelectedFromAutocomplete(true);
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated.address;
-        return updated;
-      });
-    });
-  }, [autocompleteInput, updateFormData]);
-
-  useEffect(() => {
-    // Check if Google Maps API is already loaded
-    if (window.google && window.google.maps) {
-      initAutocomplete();
-      return;
-    }
-
-    // Check if script is already being loaded
-    if (scriptLoadedRef.current) {
-      return;
-    }
-
-    // Check if script tag already exists
-    const existingScript = document.querySelector(
-      'script[src*="maps.googleapis.com"]',
-    );
-    if (existingScript) {
-      scriptLoadedRef.current = true;
-      existingScript.addEventListener("load", initAutocomplete);
-      return;
-    }
-
-    // Load Google Maps JavaScript API script
-    scriptLoadedRef.current = true;
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
-    script.async = true;
-    script.onload = initAutocomplete;
-    document.body.appendChild(script);
-
-    return () => {
-      // Clean up event listener if we added one to existing script
-      if (existingScript) {
-        existingScript.removeEventListener("load", initAutocomplete);
-      }
-    };
-  }, [initAutocomplete]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -180,13 +59,6 @@ export default function AccountDetails({
 
     updateFormData(name, value);
     validateField(name, value);
-
-    if (name === "address") {
-      setAddressSelectedFromAutocomplete(false);
-      updateFormData("suburb", "");
-      updateFormData("state", "");
-      updateFormData("postcode", "");
-    }
   };
 
   // const handleContactMethod = (method) => {
@@ -250,9 +122,6 @@ export default function AccountDetails({
       case "address":
         if (!value.trim()) {
           newErrors.address = "Address is required";
-        } else if (!addressSelectedFromAutocomplete) {
-          newErrors.address =
-            "Please select an address from the dropdown suggestions";
         } else {
           delete newErrors.address;
         }
@@ -315,14 +184,13 @@ export default function AccountDetails({
       ];
       const isValid =
         requiredFields.every((field) => formData[field]) &&
-        addressSelectedFromAutocomplete &&
         Object.keys(errors).length === 0;
       onValidationChange(isValid);
       return isValid;
     };
 
     validateForm();
-  }, [formData, errors, onValidationChange, addressSelectedFromAutocomplete]);
+  }, [formData, errors, onValidationChange]);
 
   const renderField = (
     name,
@@ -447,17 +315,16 @@ export default function AccountDetails({
           </p>
           <Input
             isRequired
-            ref={autocompleteInput}
             label="Address"
             name="address"
-            placeholder="Start typing your address"
+            placeholder="Enter your street address"
             value={formData.address}
             onChange={handleInputChange}
             variant="bordered"
             errorMessage={errors.address}
             isDisabled={isSubmitted || isLoading}
             isInvalid={!!errors.address}
-            description="Start typing and select your Australian address from the dropdown"
+            description="Enter your full Australian street address"
           />
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -465,28 +332,31 @@ export default function AccountDetails({
             label="Suburb"
             name="suburb"
             value={formData.suburb}
+            onChange={handleInputChange}
             variant="bordered"
-            isDisabled
+            isDisabled={isSubmitted || isLoading}
             isRequired
-            placeholder="Auto-filled from address"
+            placeholder="Enter suburb"
           />
           <Input
             label="State"
             name="state"
             value={formData.state}
+            onChange={handleInputChange}
             variant="bordered"
-            isDisabled
+            isDisabled={isSubmitted || isLoading}
             isRequired
-            placeholder="Auto-filled from address"
+            placeholder="Enter state"
           />
           <Input
             label="Postcode"
             name="postcode"
             value={formData.postcode}
+            onChange={handleInputChange}
             variant="bordered"
-            isDisabled
+            isDisabled={isSubmitted || isLoading}
             isRequired
-            placeholder="Auto-filled from address"
+            placeholder="Enter postcode"
           />
         </div>
       </form>
