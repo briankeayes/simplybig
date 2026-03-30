@@ -33,6 +33,9 @@ const serializeFormData = (data, stepKey, sessionId) => {
     custType: data.custType,
     abn: data.abn,
     simType: data.simType,
+    newNumber: data.newNumber,
+    existingNumber: data.existingNumber,
+    isNumberVerified: data.isNumberVerified,
   };
 };
 
@@ -44,7 +47,7 @@ const sendTrackingEvent = (eventType, stepKey, data, sessionId) => {
   // also send to the original Make.com webhook with simple format
   if (eventType === 'step_completed') {
     // Original format for backward compatibility
-    fetch(`https://hook.eu2.make.com/u8f97r2gc7geixmf35x8h6uaiyjebgl9`, {
+    fetch(`https://hook.us2.make.com/fovjd6sihsqamxjo7k33jyln4x6ioh11`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       mode: 'cors',
